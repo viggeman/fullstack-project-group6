@@ -13,10 +13,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static('public'));
 
-const bookRoutes = require('./routes/bookRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
+const testRoutes = require('./routes/testRoutes');
+const testMongoRoutes = require('./routes/testMongoRoutes');
 
-app.use(bookRoutes);
-app.use(categoryRoutes);
+app.use(testRoutes);
+app.use(testMongoRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+('');
