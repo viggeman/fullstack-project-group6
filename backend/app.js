@@ -15,21 +15,21 @@ app.use(express.static('public'));
 
 const testRoutes = require('./routes/testRoutes');
 const testMongoRoutes = require('./routes/testMongoRoutes');
-const actorsRoutes = require('./controllers/actorsController');
-const directorsRoutes = require('./controllers/directorsController');
-const genresRoutes = require('./controllers/genresController');
-const movieActorsRoutes = require('./controllers/movieActorsController');
-const moviesRoutes = require('./controllers/moviesController');
-const writersRoutes = require('./controllers/writersController');
+const actorsRoutes = require('./routes/actorsRoutes');
+// const directorsRoutes = require('./controllers/directorsController');
+// const genresRoutes = require('./controllers/genresController');
+// const movieActorsRoutes = require('./controllers/movieActorsController');
+// const moviesRoutes = require('./controllers/moviesController');
+// const writersRoutes = require('./controllers/writersController');
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
 app.use(actorsRoutes);
-app.use(directorsRoutes);
-app.use(genresRoutes);
-app.use(movieActorsRoutes);
-app.use(moviesRoutes);
-app.use(writersRoutes);
+// app.use(directorsRoutes);
+// app.use(genresRoutes);
+// app.use(movieActorsRoutes);
+// app.use(moviesRoutes);
+// app.use(writersRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');
