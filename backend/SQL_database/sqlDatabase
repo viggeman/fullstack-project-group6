@@ -2,24 +2,28 @@ CREATE DATABASE backendGrupp6;
 
 use backendGrupp6;
 
+-- David
 CREATE TABLE genres(
     genreId INT NOT NULL AUTO_INCREMENT UNIQUE,
     genreName VARCHAR(50),
     PRIMARY KEY (genreId)
 );
 
+-- Christopher
 CREATE TABLE actors(
     actorId INT NOT NULL AUTO_INCREMENT UNIQUE,
     actorName VARCHAR(50),
     PRIMARY KEY (actorId)
 );
 
+-- Victor
 CREATE TABLE writers(
     writerId INT NOT NULL AUTO_INCREMENT UNIQUE,
     writerName VARCHAR(50),
     PRIMARY KEY (writerId)
 );
 
+-- Jonathan
 CREATE TABLE directors(
     directorId INT NOT NULL AUTO_INCREMENT UNIQUE,
     directorName VARCHAR(50),
@@ -35,17 +39,17 @@ CREATE TABLE movies(
     writerWId INT,
     directorDId INT,
     PRIMARY KEY (movieId),
-    FOREIGN KEY (genreGId) REFERENCES Genres(genreId),
-    FOREIGN KEY (writerWId) REFERENCES Writers(writerId),
-    FOREIGN KEY (directorDId) REFERENCES Directors(directorId)
-
+    FOREIGN KEY (genreGId) REFERENCES genres(genreId),
+    FOREIGN KEY (writerWId) REFERENCES writers(writerId),
+    FOREIGN KEY (directorDId) REFERENCES directors(directorId)
 );
+
 CREATE TABLE movieActors (
     movieMId INT,
     actorAId INT,
     PRIMARY KEY (movieMId, actorAId),
-    FOREIGN KEY (movieMId) REFERENCES Movies(movieId),
-    FOREIGN KEY (actorAId) REFERENCES Actors(actorId)
+    FOREIGN KEY (movieMId) REFERENCES movies(movieId),
+    FOREIGN KEY (actorAId) REFERENCES actors(actorId)
 );
 
 -- Add genres
@@ -91,14 +95,19 @@ INSERT INTO directors (directorName) VALUES
 ('Coen Brothers');
 
 -- Add movies
-INSERT INTO movies (movieName, movieReleaseYear, imdbId, actorAId, genreGId, writerWId, directorDId)
+INSERT INTO movies (movieName, movieReleaseYear, imdbId, genreGId, writerWId, directorDId)
 VALUES
-('Inception', 2010, 'tt1375666', 2, 3, 1, 1),
-('The Shawshank Redemption', 1994, 'tt0111161', 1, 1, 3, 2),
-('The Dark Knight', 2008, 'tt0468569', 1, 1, 1, 1),
-('Fight Club', 1999, 'tt0137523', 2, 4, 4, 4),
-('The Godfather', 1972, 'tt0068646', 1, 1, 3, 5),
-('Pulp Fiction', 1994, 'tt0110912', 1, 2, 1, 1),
-('Titanic', 1997, 'tt0120338', 2, 6, 1, 6),
-('Avatar', 2009, 'tt0499549', 2, 3, 6, 6),
-('The Lord of the Rings: The Fellowship of the Ring', 2001, 'tt0120737', 10, 5, 10, 7);
+('Inception', 2010, 'tt1375666', 3, 1, 1),
+('The Shawshank Redemption', 1994, 'tt0111161', 1, 3, 2),
+('The Dark Knight', 2008, 'tt0468569', 1, 1, 1),
+('Fight Club', 1999, 'tt0137523', 4, 4, 4),
+('The Godfather', 1972, 'tt0068646', 1, 3, 5),
+('Pulp Fiction', 1994, 'tt0110912', 2, 1, 1),
+('Titanic', 1997, 'tt0120338', 6, 1, 6),
+('Avatar', 2009, 'tt0499549', 3, 6, 6),
+('The Lord of the Rings: The Fellowship of the Ring', 2001, 'tt0120737', 5, 10, 7);
+
+-- Add movieActors
+INSERT INTO movieActors (movieMId, actorAId)
+VALUES
+(1, 1);
