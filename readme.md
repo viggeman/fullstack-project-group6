@@ -16,12 +16,16 @@ npm install
 
 ## Development server
 
-Start the Vue vite server
+Start Vue vite server
 
 ```bash
 # npm
 npm run dev
 ```
 
-Start the mySQL server,
-#FILL OUT LATER
+Start Express server,
+
+```bash
+# node
+node app.js
+```
