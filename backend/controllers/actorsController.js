@@ -15,7 +15,7 @@ const ActorController = {
     },
 
     getActorById(req, res) {
-        const actorId = req.params.id;
+        const actorId = req.params.actorId;
         connection.query(
             'SELECT * FROM actors WHERE actorId = ?',
             [actorId],
@@ -57,7 +57,8 @@ const ActorController = {
     },
 
     deleteActorById(req, res) {
-        const actorId = req.params.id;
+        const actorId = req.params.actorId;
+        console.log('Försöker ta bort skådespelare med ID:', actorId);
         const sql = 'DELETE FROM actors WHERE actorId = ?';
         connection.query(sql, [actorId], (error, results, fields) => {
             if (error) {
@@ -67,12 +68,13 @@ const ActorController = {
                 });
                 return;
             }
+            console.log('Skådespelare med ID', actorId, 'har tagits bort');
             res.json({ message: 'Skådespelare borttagen' });
         });
     },
 
     updateActorById(req, res) {
-        const actorId = req.params.id;
+        const actorId = req.params.actorId;
         const { actorName } = req.body;
         const sql = 'UPDATE actors SET actorName = ? WHERE actorId = ?';
         connection.query(
