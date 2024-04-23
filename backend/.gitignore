@@ -2,4 +2,3 @@ node_modules
 .DS_Store
 connectionMySQL.js
 connectionMongoDB.js
-package-lock.json
