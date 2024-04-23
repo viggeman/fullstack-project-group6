@@ -22,6 +22,16 @@ exports.deleteTestMysql = (req, res) => {
   res.send('DELETE MySQL.');
 };
 
+exports.deleteTestMysqlParam = (req, res) => {
+  const { params } = req.params;
+  res.send('DELETE MySQL params: ' + params);
+};
+
 exports.putTestMysql = (req, res) => {
   res.send('PUT MySQL.');
+};
+
+exports.putTestMysqlParam = (req, res) => {
+  const { params } = req.params;
+  res.send('PUT MySQL params: ' + params);
 };

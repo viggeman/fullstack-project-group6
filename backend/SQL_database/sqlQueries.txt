@@ -1,0 +1,68 @@
+-- Global queries
+SELECT * FROM Movies;
+
+SELECT * FROM Writers;
+
+SELECT * FROM Directors;
+
+SELECT * FROM MovieActors WHERE movie_id = 1;
+
+SELECT * FROM Movies WHERE movie_id = 14;
+
+-- Specified queries
+SELECT
+    MovieActors.movie_id,
+    Movies.movie_name,
+    Actors.actor_id,
+    Actors.actor_name
+FROM
+    MovieActors
+JOIN
+    Movies ON MovieActors.movie_id = Movies.movie_id
+JOIN
+    Actors ON MovieActors.actor_id = Actors.actor_id
+WHERE
+    MovieActors.movie_id = 1;
+
+
+SELECT
+    Movies.movie_id,
+    Movies.movie_name,
+    Movies.movie_release_year,
+    Movies.imdb_id,
+    Actors.actor_name,
+    Genres.genre_name,
+    Directors.director_name,
+    Writers.writer_name
+
+FROM
+    Movies
+JOIN
+    Actors ON Movies.actor_id = Actors.actor_id
+JOIN
+    Genres ON Movies.genre_id = Genres.genre_id
+JOIN
+    Directors ON Movies.director_id = Directors.director_id
+JOIN
+    Writers ON Movies.writer_id = Writers.writer_id
+WHERE
+    Movies.genre_id = 1;
+
+SELECT
+    Movies.movie_id,
+    Movies.movie_name,
+    Movies.movie_release_year,
+    COUNT(MovieActors.actor_id) AS num_actors
+FROM
+    Movies
+JOIN
+    MovieActors ON Movies.movie_id = MovieActors.movie_id
+WHERE
+    Movies.movie_release_year = 1994
+GROUP BY
+    Movies.movie_id,
+    Movies.movie_name,
+    Movies.movie_release_year
+ORDER BY
+    num_actors DESC
+LIMIT 3;
