@@ -20,6 +20,16 @@ exports.deleteTestMongoose = (req, res) => {
   res.send('DELETE Mongoose.');
 };
 
+exports.deleteTestMongooseParam = (req, res) => {
+  const { params } = req.params;
+  res.send('DELETE Mongoose params: ' + params);
+};
+
 exports.putTestMongoose = (req, res) => {
   res.send('PUT Mongoose.');
+};
+
+exports.putTestMongooseParam = (req, res) => {
+  const { params } = req.params;
+  res.send('PUT Mongoose params: ' + params);
 };
