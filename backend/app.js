@@ -19,18 +19,14 @@ const testMongoRoutes = require('./routes/testMongoRoutes');
 const writersRoutes = require('./routes/writersRoutes');
 const actorsRoutes = require('./routes/actorsRoutes');
 const moviesRoutes = require('./routes/moviesRoutes');
+const movieActorsRoutes = require('./routes/movieActorsRoutes');
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
 app.use(writersRoutes);
 app.use(actorsRoutes);
 app.use(moviesRoutes);
-
-const writersRoutes = require('./routes/writersRoutes');
-
-app.use(testRoutes);
-app.use(testMongoRoutes);
-app.use(writersRoutes);
+app.use(movieActorsRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');
