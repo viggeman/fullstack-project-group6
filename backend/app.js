@@ -17,10 +17,12 @@ app.use(express.static('public'));
 const testRoutes = require('./routes/testRoutes');
 const testMongoRoutes = require('./routes/testMongoRoutes');
 const writersRoutes = require('./routes/writersRoutes');
+const actorsRoutes = require('./routes/actorsRoutes');
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
 app.use(writersRoutes);
+app.use(actorsRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');
