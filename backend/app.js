@@ -13,23 +13,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static('public'));
 
+// Only add routers that works, or else it will throw an error
 const testRoutes = require('./routes/testRoutes');
 const testMongoRoutes = require('./routes/testMongoRoutes');
 const actorsRoutes = require('./routes/actorsRoutes');
-// const directorsRoutes = require('./controllers/directorsController');
-// const genresRoutes = require('./controllers/genresController');
-// const movieActorsRoutes = require('./controllers/movieActorsController');
-// const moviesRoutes = require('./controllers/moviesController');
-// const writersRoutes = require('./controllers/writersController');
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
 app.use(actorsRoutes);
-// app.use(directorsRoutes);
-// app.use(genresRoutes);
-// app.use(movieActorsRoutes);
-// app.use(moviesRoutes);
-// app.use(writersRoutes);
+
+const writersRoutes = require('./routes/writersRoutes');
+
+app.use(testRoutes);
+app.use(testMongoRoutes);
+app.use(writersRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');
