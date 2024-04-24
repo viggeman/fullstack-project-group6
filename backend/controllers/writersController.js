@@ -32,7 +32,6 @@ exports.getWriters = async (req, res) => {
   try {
     await connectionMySQL.query(query, (error, results) => {
       if (error) throw error;
-
       res.json(results);
     });
   } catch (error) {
@@ -65,6 +64,7 @@ exports.createWriter = async (req, res) => {
   }
 };
 
+// Update a writer
 exports.updateWriter = async (req, res) => {
   const { id, writerName } = req.body;
   let query = 'UPDATE writers SET writerName = ? WHERE writerId = ?';
@@ -98,6 +98,7 @@ exports.updateWriter = async (req, res) => {
   }
 };
 
+// Delete a writer
 exports.deleteWriter = (req, res) => {
   const { id } = req.body;
   if (isNaN(id) || id === '') {
@@ -106,7 +107,6 @@ exports.deleteWriter = (req, res) => {
       message: 'Invalid writer id',
     });
   }
-  // DELETE writer with id
   let query = 'DELETE FROM writers WHERE writerId = ?';
   try {
     connectionMySQL.query(query, [id], (error, results) => {

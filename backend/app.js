@@ -24,11 +24,5 @@ app.use(testMongoRoutes);
 app.use(writersRoutes);
 app.use(actorsRoutes);
 
-const writersRoutes = require('./routes/writersRoutes');
-
-app.use(testRoutes);
-app.use(testMongoRoutes);
-app.use(writersRoutes);
-
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');
