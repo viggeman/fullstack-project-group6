@@ -16,10 +16,12 @@ app.use(express.static('public'));
 // Only add routers that works, or else it will throw an error
 const testRoutes = require('./routes/testRoutes');
 const testMongoRoutes = require('./routes/testMongoRoutes');
+const writersRoutes = require('./routes/writersRoutes');
 const actorsRoutes = require('./routes/actorsRoutes');
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
+app.use(writersRoutes);
 app.use(actorsRoutes);
 
 const writersRoutes = require('./routes/writersRoutes');
