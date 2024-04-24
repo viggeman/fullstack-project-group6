@@ -10,6 +10,25 @@
       <input type="text" v-model="postInput" />
       <input type="submit" @click="postSubmit" />
     </div>
+
+    <div style="border: 1px solid black">
+      <h1>Delete writer</h1>
+      <p v-if="errors.deleteError" style="color: red">
+        {{ errors.deleteError }}
+      </p>
+      <p v-if="response.success" style="color: green">{{ response.message }}</p>
+      <select v-model="deleteSelected">
+        <option
+          v-for="items in getData"
+          :key="items.writerId"
+          :value="items.writerId"
+        >
+          {{ items.writerName }}
+        </option>
+      </select>
+      <input disabled type="text" v-model="deleteSelected" />
+      <input type="submit" @click="deleteSubmit" />
+    </div>
     <div style="border: 1px solid black">
       <h1>Put writer</h1>
       <p v-if="errors.putError" style="color: red">{{ errors.putError }}</p>
@@ -58,6 +77,7 @@
         message: '',
       });
       const putNewEntry = ref('');
+      const deleteSelected = ref(null);
 
       const fetchDataAsync = async () => {
         getData.value = await fetchData(url);
@@ -126,11 +146,37 @@
         }
       };
 
-      // const dataPut = putData(url, { id: id, writerName: 'Pell Kula' });
-      // console.log(dataPut);
-
-      // const dataPost = postData(url, { writerName: 'Pell Kula den kule' });
-      // console.log(dataPost);
+      const deleteSubmit = async () => {
+        id.value = deleteSelected.value;
+        const removed = getData.value.find(
+          (item) => item.writerId === id.value
+        ).writerName;
+        if (id.value === null) {
+          errors.value.deleteError = 'Please select a name';
+          console.log(errors.value.deleteError);
+          return errors.value.deleteError;
+        }
+        const dataDelete = await deleteData(url, { id: id.value });
+        if (dataDelete.success) {
+          console.log(removed);
+          response.value = {
+            success: dataDelete.success,
+            message: `${dataDelete.message}! Writer ${removed} is removed!`,
+          };
+          errors.value.deleteError = '';
+          fetchDataAsync();
+          console.log('dataDelete', dataDelete);
+          return dataDelete;
+        } else {
+          response.value = {
+            success: dataDelete.success,
+            message: dataDelete.message,
+          };
+          errors.value.deleteError = '';
+          console.log(dataDelete);
+          return dataDelete;
+        }
+      };
 
       // const dataDelete = deleteData(url, { id: id });
       // console.log(dataDelete);
@@ -143,8 +189,10 @@
         response,
         putSelected,
         putNewEntry,
+        deleteSelected,
         postSubmit,
         putSubmit,
+        deleteSubmit,
       };
     },
   };
