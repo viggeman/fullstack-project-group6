@@ -1,139 +1,175 @@
-const connection = require('../connectionMySQL');
+const connectionMySQL = require('../connectionMySQL');
 
-const MovieController = {
-    getAllMovies(req, res) {
-        connection.query('SELECT * FROM movies', (error, results, fields) => {
-            if (error) {
-                console.error('Error fetching movies:', error);
-                res.status(500).json({
-                    error: 'Kunde inte hämta filmer',
+// Get a movie by id
+exports.getMovie = async (req, res) => {
+    const { id } = req.params;
+    if (isNaN(id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid movie id',
+        });
+    }
+    let query = 'SELECT * FROM movies WHERE movieId = ?';
+    try {
+        await connectionMySQL.query(query, [id], (error, results) => {
+            if (error) throw error;
+            if (results.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Movie with id ${id} not found`,
                 });
-                return;
             }
             res.json(results);
         });
-    },
-
-    getMovieById(req, res) {
-        const movieId = req.params.movieId;
-        connection.query(
-            'SELECT * FROM movies WHERE movieId = ?',
-            [movieId],
-            (error, results, fields) => {
-                if (error) {
-                    console.error('Error fetching movie:', error);
-                    res.status(500).json({
-                        error: 'Kunde inte hämta film',
-                    });
-                    return;
-                }
-                if (results.length === 0) {
-                    res.status(404).json({
-                        error: 'Film med det angivna ID:t hittades inte',
-                    });
-                    return;
-                }
-                res.json(results[0]);
-            }
-        );
-    },
-
-    addMovie(req, res) {
-        const {
-            movieName,
-            movieReleaseYear,
-            imdbId,
-            genreGId,
-            writerWId,
-            directorDId,
-        } = req.body;
-        const sql =
-            'INSERT INTO movies (movieName, movieReleaseYear, imdbId, genreGId, writerWId, directorDId) VALUES (?, ?, ?, ?, ?, ?)';
-        connection.query(
-            sql,
-            [
-                movieName,
-                movieReleaseYear,
-                imdbId,
-                genreGId,
-                writerWId,
-                directorDId,
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    console.error('Error adding movie:', error);
-                    res.status(500).json({
-                        error: 'Kunde inte lägga till film',
-                    });
-                    return;
-                }
-                res.status(201).json({
-                    message: 'Film tillagd',
-                    film: {
-                        movieName,
-                        movieReleaseYear,
-                        imdbId,
-                        genreGId,
-                        writerWId,
-                        directorDId,
-                    },
-                });
-            }
-        );
-    },
-
-    deleteMovieById(req, res) {
-        const movieId = req.params.movieId;
-        console.log('Försöker ta bort film med ID:', movieId);
-        const sql = 'DELETE FROM movies WHERE movieId = ?';
-        connection.query(sql, [movieId], (error, results, fields) => {
-            if (error) {
-                console.error('Error deleting movie:', error);
-                res.status(500).json({
-                    error: 'Kunde inte ta bort film',
-                });
-                return;
-            }
-            console.log('Film med ID', movieId, 'har tagits bort');
-            res.json({ message: 'Film borttagen' });
-        });
-    },
-
-    updateMovieById(req, res) {
-        const movieId = req.params.movieId;
-        const {
-            movieName,
-            movieReleaseYear,
-            imdbId,
-            genreGId,
-            writerWId,
-            directorDId,
-        } = req.body;
-        const sql =
-            'UPDATE movies SET movieName = ?, movieReleaseYear = ?, imdbId = ?, genreGId = ?, writerWId = ?, directorDId = ? WHERE movieId = ?';
-        connection.query(
-            sql,
-            [
-                movieName,
-                movieReleaseYear,
-                imdbId,
-                genreGId,
-                writerWId,
-                directorDId,
-                movieId,
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    console.error('Error updating movie:', error);
-                    res.status(500).json({
-                        error: 'Kunde inte uppdatera film',
-                    });
-                    return;
-                }
-                res.json({ message: 'Film uppdaterad' });
-            }
-        );
-    },
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
 };
 
-module.exports = MovieController;
+// Get all movies
+exports.getMovies = async (req, res) => {
+    let query = 'SELECT * FROM movies';
+    try {
+        await connectionMySQL.query(query, (error, results) => {
+            if (error) throw error;
+            res.json(results);
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
+
+// Create a movie
+exports.createMovie = async (req, res) => {
+    const {
+        movieName,
+        movieReleaseYear,
+        imdbId,
+        genreGId,
+        writerWId,
+        directorDId,
+    } = req.body;
+    let query =
+        'INSERT INTO movies (movieName, movieReleaseYear, imdbId, genreGId, writerWId, directorDId) VALUES (?, ?, ?, ?, ?, ?)';
+    if (!movieName || movieName === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Provide movie name',
+        });
+    }
+    try {
+        await connectionMySQL.query(
+            query,
+            [
+                movieName,
+                movieReleaseYear,
+                imdbId,
+                genreGId,
+                writerWId,
+                directorDId,
+            ],
+            (error, results) => {
+                if (error) throw error;
+                return res.status(201).json({
+                    success: true,
+                    message: 'POST movie successful',
+                    id: results.insertId,
+                    name: movieName,
+                    releaseYear: movieReleaseYear,
+                    imdbId: imdbId,
+                    genreGId: genreGId,
+                    writerWId: writerWId,
+                    directorDId: directorDId,
+                });
+            }
+        );
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
+
+// Update a movie
+exports.updateMovie = async (req, res) => {
+    const {
+        id,
+        movieName,
+        movieReleaseYear,
+        imdbId,
+        genreGId,
+        writerWId,
+        directorDId,
+    } = req.body;
+    let query =
+        'UPDATE movies SET movieName = ?, movieReleaseYear = ?, imdbId = ?, genreGId = ?, writerWId = ?, directorDId = ? WHERE movieId = ?';
+    const params = [
+        movieName,
+        movieReleaseYear,
+        imdbId,
+        genreGId,
+        writerWId,
+        directorDId,
+        id,
+    ];
+
+    if (isNaN(id) || id === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid movie id',
+        });
+    }
+
+    try {
+        await connectionMySQL.query(query, params, (error, results) => {
+            if (error) throw error;
+            if (results.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Movie with id: ${id} not found`,
+                });
+            }
+            return res.status(200).json({
+                success: true,
+                message: 'PUT successful',
+                id: id,
+                name: movieName,
+                releaseYear: movieReleaseYear,
+                imdbId: imdbId,
+                genreGId: genreGId,
+                writerWId: writerWId,
+                directorDId: directorDId,
+            });
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
+
+// Delete a movie
+exports.deleteMovie = (req, res) => {
+    const { id } = req.body;
+    if (isNaN(id) || id === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid movie id',
+        });
+    }
+    let query = 'DELETE FROM movies WHERE movieId = ?';
+    try {
+        connectionMySQL.query(query, [id], (error, results) => {
+            if (error) throw error;
+            if (results.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Movie with id: ${id} not found`,
+                });
+            }
+            return res.status(200).json({
+                success: true,
+                message: 'DELETE successful',
+                id: id,
+            });
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
