@@ -6,7 +6,7 @@ const genresController = require('../controllers/genresController');
 router.get('/api/genres', genresController.getAllGenres);
 
 // POST - Lägg till Genre.
-router.post('/api/genres/post', genresController.postGenre);
+router.post('/api/genres', genresController.postGenre);
 
 // DELETE - Ta bort en Genre.
 router.delete('/api/genres/:genreId', genresController.deleteOneGenre);
