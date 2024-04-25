@@ -1,59 +1,82 @@
 <template>
-    <div>
-        <h1 v-for="items in getData">
-            {{ items.actorName }} + ID {{ items.actorId }}
-        </h1>
-        <div style="border: 1px solid black">
-            <h1>Post actor</h1>
-            <p v-if="errors.postError" style="color: red">
-                {{ errors.postError }}
-            </p>
-            <p v-if="response.success" style="color: green">
-                {{ response.message }}
-            </p>
-            <input type="text" v-model="postInput" />
-            <input type="submit" @click="postSubmit" />
+    <div class="container">
+        <div class="actor-section">
+            <h1 v-for="item in getData" :key="item.actorId">
+                {{ item.actorName }} (ID: {{ item.actorId }})
+            </h1>
         </div>
 
-        <div style="border: 1px solid black">
+        <div class="actor-section">
+            <h1>Post actor</h1>
+            <p v-if="errors.postError" class="error-message">
+                {{ errors.postError }}
+            </p>
+            <p v-if="response.success" class="success-message">
+                {{ response.message }}
+            </p>
+            <div class="input-section">
+                <input
+                    type="text"
+                    v-model="postInput"
+                    placeholder="Enter actor name"
+                    class="input-field small-input"
+                />
+                <button @click="postSubmit" class="submit-button">
+                    Submit
+                </button>
+            </div>
+        </div>
+
+        <div class="actor-section">
             <h1>Delete actor</h1>
-            <p v-if="errors.deleteError" style="color: red">
+            <p v-if="errors.deleteError" class="error-message">
                 {{ errors.deleteError }}
             </p>
-            <p v-if="response.success" style="color: green">
+            <p v-if="response.success" class="success-message">
                 {{ response.message }}
             </p>
-            <select v-model="deleteSelected">
-                <option
-                    v-for="items in getData"
-                    :key="items.actorId"
-                    :value="items.actorId"
-                >
-                    {{ items.actorName }}
-                </option>
-            </select>
-            <input disabled type="text" v-model="deleteSelected" />
-            <input type="submit" @click="deleteSubmit" />
+            <div class="input-section">
+                <select v-model="deleteSelected" class="select-field">
+                    <option
+                        v-for="item in getData"
+                        :key="item.actorId"
+                        :value="item.actorId"
+                    >
+                        {{ item.actorName }} (ID: {{ item.actorId }})
+                    </option>
+                </select>
+                <button @click="deleteSubmit" class="submit-button">
+                    Delete
+                </button>
+            </div>
         </div>
-        <div style="border: 1px solid black">
+
+        <div class="actor-section">
             <h1>Put actor</h1>
-            <p v-if="errors.putError" style="color: red">
+            <p v-if="errors.putError" class="error-message">
                 {{ errors.putError }}
             </p>
-            <p v-if="response.success" style="color: green">
+            <p v-if="response.success" class="success-message">
                 {{ response.message }}
             </p>
-            <select v-model="putSelected">
-                <option
-                    v-for="items in getData"
-                    :key="items.actorId"
-                    :value="items.actorId"
-                >
-                    {{ items.actorName }}
-                </option>
-            </select>
-            <input type="text" v-model="putNewEntry" />
-            <input type="submit" @click="putSubmit" />
+            <div class="input-section">
+                <select v-model="putSelected" class="select-field">
+                    <option
+                        v-for="item in getData"
+                        :key="item.actorId"
+                        :value="item.actorId"
+                    >
+                        {{ item.actorName }} (ID: {{ item.actorId }})
+                    </option>
+                </select>
+                <input
+                    type="text"
+                    v-model="putNewEntry"
+                    placeholder="Enter new actor name"
+                    class="input-field small-input"
+                />
+                <button @click="putSubmit" class="submit-button">Update</button>
+            </div>
         </div>
     </div>
 </template>
@@ -206,5 +229,83 @@ export default {
 </script>
 
 <style scoped>
-/* Your component's CSS styles go here */
+.container {
+    background-color: black;
+    background-image: radial-gradient(rgba(0, 150, 0, 0.75), black 120%);
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    padding: 2rem;
+    color: white;
+    font: 1.3rem Inconsolata, monospace;
+    text-shadow: 0 0 5px #c8c8c8;
+    position: relative;
+}
+
+.actor-section {
+    padding: 10px;
+}
+
+.actor-section h1 {
+    font-size: 16px;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.input-field,
+.select-field {
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #fff;
+    background-color: #000;
+    color: #fff;
+    width: 50%;
+}
+
+.small-input {
+    width: 50%; /* Mindre bredd för input-fält */
+}
+
+.input-field::placeholder,
+.select-field option {
+    color: #888;
+}
+
+.submit-button {
+    padding: 5px 10px;
+    border: 1px solid #fff;
+    background-color: #888;
+    color: #000;
+    cursor: pointer;
+}
+
+.error-message {
+    color: #ff6347;
+}
+
+.success-message {
+    color: #32cd32;
+}
+
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.15),
+        rgba(255, 255, 255, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+}
 </style>
