@@ -3,7 +3,9 @@
 </script>
 
 <template>
-  <HelloWorld msg="Hello + GRuPp 6" />
+  <!-- <HelloWorld msg="Hello + GRuPp 6" />
+   -->
+  <router-view />
 </template>
 
 <style scoped></style>

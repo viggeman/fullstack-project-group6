@@ -25,8 +25,6 @@ app.use(testRoutes);
 app.use(testMongoRoutes);
 app.use(writersRoutes);
 app.use(actorsRoutes);
-app.use(moviesRoutes);
-app.use(movieActorsRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');
