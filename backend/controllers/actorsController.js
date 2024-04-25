@@ -1,97 +1,129 @@
-const connection = require('../connectionMySQL');
+const connectionMySQL = require('../connectionMySQL');
 
-const ActorController = {
-    getAllActors(req, res) {
-        connection.query('SELECT * FROM actors', (error, results, fields) => {
-            if (error) {
-                console.error('Error fetching actors:', error);
-                res.status(500).json({
-                    error: 'Kunde inte hämta skådespelare',
+// Get an actor by id
+exports.getActor = async (req, res) => {
+    const { id } = req.params;
+    if (isNaN(id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid actor id',
+        });
+    }
+    let query = 'SELECT * FROM actors WHERE actorId = ?';
+    try {
+        await connectionMySQL.query(query, [id], (error, results) => {
+            if (error) throw error;
+            if (results.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Actor with id ${id} not found`,
                 });
-                return;
             }
             res.json(results);
         });
-    },
-
-    getActorById(req, res) {
-        const actorId = req.params.actorId;
-        connection.query(
-            'SELECT * FROM actors WHERE actorId = ?',
-            [actorId],
-            (error, results, fields) => {
-                if (error) {
-                    console.error('Error fetching actor:', error);
-                    res.status(500).json({
-                        error: 'Kunde inte hämta skådespelare',
-                    });
-                    return;
-                }
-                if (results.length === 0) {
-                    res.status(404).json({
-                        error: 'Skådespelare med det angivna ID:t hittades inte',
-                    });
-                    return;
-                }
-                res.json(results[0]);
-            }
-        );
-    },
-
-    addActor(req, res) {
-        const { actorName } = req.body;
-        const sql = 'INSERT INTO actors (actorName) VALUES (?)';
-        connection.query(sql, [actorName], (error, results, fields) => {
-            if (error) {
-                console.error('Error adding actor:', error);
-                res.status(500).json({
-                    error: 'Kunde inte lägga till skådespelare',
-                });
-                return;
-            }
-            res.status(201).json({
-                message: 'Skådespelare tillagd',
-                skådespelare: { actorName },
-            });
-        });
-    },
-
-    deleteActorById(req, res) {
-        const actorId = req.params.actorId;
-        console.log('Försöker ta bort skådespelare med ID:', actorId);
-        const sql = 'DELETE FROM actors WHERE actorId = ?';
-        connection.query(sql, [actorId], (error, results, fields) => {
-            if (error) {
-                console.error('Error deleting actor:', error);
-                res.status(500).json({
-                    error: 'Kunde inte ta bort skådespelare',
-                });
-                return;
-            }
-            console.log('Skådespelare med ID', actorId, 'har tagits bort');
-            res.json({ message: 'Skådespelare borttagen' });
-        });
-    },
-
-    updateActorById(req, res) {
-        const actorId = req.params.actorId;
-        const { actorName } = req.body;
-        const sql = 'UPDATE actors SET actorName = ? WHERE actorId = ?';
-        connection.query(
-            sql,
-            [actorName, actorId],
-            (error, results, fields) => {
-                if (error) {
-                    console.error('Error updating actor:', error);
-                    res.status(500).json({
-                        error: 'Kunde inte uppdatera skådespelare',
-                    });
-                    return;
-                }
-                res.json({ message: 'Skådespelare uppdaterad' });
-            }
-        );
-    },
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
 };
 
-module.exports = ActorController;
+// Get all actors
+exports.getActors = async (req, res) => {
+    let query = 'SELECT * FROM actors';
+    try {
+        await connectionMySQL.query(query, (error, results) => {
+            if (error) throw error;
+            res.json(results);
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
+
+// Create an actor
+exports.createActor = async (req, res) => {
+    const { actorName } = req.body;
+    let query = 'INSERT INTO actors (actorName) VALUES (?)';
+    if (!actorName || actorName === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Provide actor name',
+        });
+    }
+    try {
+        await connectionMySQL.query(query, [actorName], (error, results) => {
+            if (error) throw error;
+            return res.status(201).json({
+                success: true,
+                message: 'POST actor successfull',
+                id: results.insertId,
+                name: actorName,
+            });
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
+
+// Update an actor
+exports.updateActor = async (req, res) => {
+    const { id, actorName } = req.body;
+    let query = 'UPDATE actors SET actorName = ? WHERE actorId = ?';
+    const params = [actorName, id];
+
+    if (isNaN(id) || id === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid actor id',
+        });
+    }
+
+    try {
+        await connectionMySQL.query(query, params, (error, results) => {
+            if (error) throw error;
+            if (results.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Actor with id: ${id} not found`,
+                });
+            }
+            return res.status(200).json({
+                success: true,
+                message: 'PUT successfull',
+                id: id,
+                name: actorName,
+            });
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
+
+// Delete an actor
+exports.deleteActor = (req, res) => {
+    const { id } = req.body;
+    if (isNaN(id) || id === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid actor id',
+        });
+    }
+    let query = 'DELETE FROM actors WHERE actorId = ?';
+    try {
+        connectionMySQL.query(query, [id], (error, results) => {
+            if (error) throw error;
+            if (results.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Actor with id: ${id} not found`,
+                });
+            }
+            return res.status(200).json({
+                success: true,
+                message: 'DELETE successfull',
+                id: id,
+            });
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
