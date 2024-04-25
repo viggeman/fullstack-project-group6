@@ -18,7 +18,7 @@ const testRoutes = require('./routes/testRoutes');
 const testMongoRoutes = require('./routes/testMongoRoutes');
 const writersRoutes = require('./routes/writersRoutes');
 const actorsRoutes = require('./routes/actorsRoutes');
-const genresRoutes = require('./routes/genresRoutes');
+
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
