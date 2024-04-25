@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <h1 v-for="items in getData">
       {{ items.writerName }} + ID {{ items.writerId }}
     </h1>
@@ -29,6 +29,7 @@
       <input disabled type="text" v-model="deleteSelected" />
       <input type="submit" @click="deleteSubmit" />
     </div>
+
     <div style="border: 1px solid black">
       <h1>Put writer</h1>
       <p v-if="errors.putError" style="color: red">{{ errors.putError }}</p>
@@ -62,7 +63,6 @@
     setup() {
       const url = 'http://localhost:3000/api/writers/';
       const id = ref(null);
-
       const postInput = ref('');
       const putSelected = ref(null);
       const getData = ref(null);
@@ -178,9 +178,6 @@
         }
       };
 
-      // const dataDelete = deleteData(url, { id: id });
-      // console.log(dataDelete);
-
       return {
         // Your component's data, methods, and computed properties go here
         getData,
@@ -200,4 +197,41 @@
 
 <style scoped>
   /* Your component's CSS styles go here */
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  input[type='text'],
+  select {
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 200px;
+  }
+
+  input[type='submit'] {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+
+  input[type='submit']:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 </style>
