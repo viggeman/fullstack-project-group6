@@ -18,13 +18,13 @@ const testRoutes = require('./routes/testRoutes');
 const testMongoRoutes = require('./routes/testMongoRoutes');
 const writersRoutes = require('./routes/writersRoutes');
 const actorsRoutes = require('./routes/actorsRoutes');
-const moviesRoutes = require('./routes/moviesRoutes');
-const movieActorsRoutes = require('./routes/movieActorsRoutes');
+
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
 app.use(writersRoutes);
 app.use(actorsRoutes);
+app.use(genresRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');

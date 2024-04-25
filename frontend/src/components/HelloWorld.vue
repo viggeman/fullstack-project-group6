@@ -14,6 +14,7 @@
   <a href="https://github.com/viggeman/fullstack-project-group6" target="_blank"
     >REPO</a
   >
+  
 </template>
 
 <style scoped></style>
