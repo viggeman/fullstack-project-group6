@@ -265,10 +265,11 @@ export default {
     background-color: #000;
     color: #fff;
     width: 50%;
+    font-family: Inconsolata, monospace; /* Tillämpa samma font som på resten av komponenten */
 }
 
 .small-input {
-    width: 50%; /* Mindre bredd för input-fält */
+    width: 50%;
 }
 
 .input-field::placeholder,
