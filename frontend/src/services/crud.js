@@ -10,7 +10,7 @@ const fetchData = async (url, id) => {
     return data;
   } catch (error) {
     console.error('Error fetching data:', error);
-    return [];
+    return error.response.data;
   }
 };
 
@@ -25,7 +25,7 @@ const postData = async (url, body) => {
     return data;
   } catch (error) {
     console.error('Error posting data:', error);
-    return null;
+    return error.response.data;
   }
 };
 
@@ -40,7 +40,7 @@ const putData = async (url, body) => {
     return data;
   } catch (error) {
     console.error('Error putting data:', error);
-    return null;
+    return error.response.data;
   }
 };
 
@@ -51,7 +51,7 @@ const deleteData = async (url, body) => {
     return data;
   } catch (error) {
     console.error('Error deleting data:', error);
-    return null;
+    return error.response.data;
   }
 };
 

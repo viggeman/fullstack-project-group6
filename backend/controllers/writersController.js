@@ -107,20 +107,30 @@ exports.deleteWriter = (req, res) => {
       message: 'Invalid writer id',
     });
   }
-  let query = 'DELETE FROM writers WHERE writerId = ?';
+  let checkQuery = 'SELECT * FROM movies WHERE writerWId = ?';
   try {
-    connectionMySQL.query(query, [id], (error, results) => {
+    connectionMySQL.query(checkQuery, [id], (error, results) => {
       if (error) throw error;
-      if (results.affectedRows === 0) {
-        return res.status(404).json({
+      if (results.length > 0) {
+        return res.status(400).json({
           success: false,
-          message: `Writer with id: ${id} not found`,
+          message: `Cannot delete writer with id: ${id} because it is connected to movies`,
         });
       }
-      return res.status(200).json({
-        success: true,
-        message: 'DELETE successfull',
-        id: id,
+      let deleteQuery = 'DELETE FROM writers WHERE writerId = ?';
+      connectionMySQL.query(deleteQuery, [id], (error, results) => {
+        if (error) throw error;
+        if (results.affectedRows === 0) {
+          return res.status(404).json({
+            success: false,
+            message: `Writer with id: ${id} not found`,
+          });
+        }
+        return res.status(200).json({
+          success: true,
+          message: 'DELETE successful',
+          id: id,
+        });
       });
     });
   } catch (error) {
