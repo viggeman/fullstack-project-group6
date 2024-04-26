@@ -5,7 +5,9 @@
 <template>
   <!-- <HelloWorld msg="Hello + GRuPp 6" />
    -->
-  <router-view />
+  <div class="container">
+    <router-view />
+  </div>
 </template>
 
 <style scoped></style>

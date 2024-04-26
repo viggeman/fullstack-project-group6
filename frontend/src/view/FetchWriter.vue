@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <h1 v-for="items in getData">
       {{ items.writerName }} + ID {{ items.writerId }}
     </h1>
