@@ -71,3 +71,23 @@ exports.getActorsForMovie = async (req, res) => {
         return res.status(500).json('Internal Server Error: ' + error);
     }
 };
+
+// Get all movies for an actor
+exports.getMoviesForActor = async (req, res) => {
+    const { actorAId } = req.params;
+    if (isNaN(actorAId)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid actor id',
+        });
+    }
+    let query = 'SELECT * FROM movieActors WHERE actorAId = ?';
+    try {
+        await connectionMySQL.query(query, [actorAId], (error, results) => {
+            if (error) throw error;
+            res.json(results);
+        });
+    } catch (error) {
+        return res.status(500).json('Internal Server Error: ' + error);
+    }
+};
