@@ -6,8 +6,7 @@
     putData,
     deleteData,
   } from '../services/crud.js';
-  import ListComponent from '../components/ListComponent.vue';
-  // import TestComponent from '../components/TestComponent.vue';
+  // import ListComponent from '../components/ListComponent.vue';
 
   const url = 'http://localhost:3000/api/writers/';
   const id = ref(null);
@@ -113,10 +112,11 @@
 
 <template>
   <div>
-    <ListComponent :items="getData" />
-    <!-- <h1 v-for="items in getData">
-      {{ items.writerName }} + ID {{ items.writerId }}
-    </h1> -->
+    <ul>
+      <li v-for="item in getData">
+        {{ item.writerName }}: ID {{ item.writerId }}
+      </li>
+    </ul>
     <div style="border: 1px solid black">
       <h1>Post writer</h1>
       <p v-if="errors" style="color: red">{{ errors }}</p>
