@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import FetchWriter from '../view/FetchWriter.vue';
 import FetchActor from '../view/FetchActor.vue';
+import FetchMovieActors from '../view/FetchMovieActors.vue';
 
 const routes = [
     { path: '/fetch-writer', component: FetchWriter },
     { path: '/fetch-actor', component: FetchActor },
+    { path: '/fetch-movie-actor', component: FetchMovieActors },
 ];
 
 const router = createRouter({

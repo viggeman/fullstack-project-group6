@@ -10,8 +10,14 @@ router.delete('/api/movie-actors', movieActorsController.removeActorFromMovie);
 
 // GET request to fetch all actors for a movie
 router.get(
-    '/api/movie-actors/:movieMId',
+    '/api/movie-actors/movie/:movieMId',
     movieActorsController.getActorsForMovie
+);
+
+// GET request to fetch all movies for an actor
+router.get(
+    '/api/movie-actors/actor/:actorAId',
+    movieActorsController.getMoviesForActor
 );
 
 module.exports = router;
