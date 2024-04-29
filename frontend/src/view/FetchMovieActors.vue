@@ -266,4 +266,85 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.container {
+    background-color: black;
+    background-image: radial-gradient(rgba(0, 150, 0, 0.75), black 120%);
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    padding: 2rem;
+    color: white;
+    font: 1.3rem Inconsolata, monospace;
+    text-shadow: 0 0 5px #c8c8c8;
+    position: relative;
+}
+
+.actor-section {
+    padding: 10px;
+}
+
+.actor-section h1 {
+    font-size: 16px;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.input-field,
+.select-field {
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #fff;
+    background-color: #000;
+    color: #fff;
+    width: 50%;
+    font-family: Inconsolata, monospace; /* Tillämpa samma font som på resten av komponenten */
+}
+
+.small-input {
+    width: 50%;
+}
+
+.input-field::placeholder,
+.select-field option {
+    color: #888;
+}
+
+.submit-button {
+    padding: 5px 10px;
+    border: 1px solid #fff;
+    background-color: #888;
+    color: #000;
+    cursor: pointer;
+}
+
+.error-message {
+    color: #ff6347;
+}
+
+.success-message {
+    color: #32cd32;
+}
+
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.15),
+        rgba(255, 255, 255, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+}
+</style>
