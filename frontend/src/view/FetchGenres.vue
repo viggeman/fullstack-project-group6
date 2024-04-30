@@ -12,10 +12,7 @@
         <input type="text" v-model="newGenre" placeholder="Genre Namn">
         <p v-if="newGenre.length < 4 && newGenre.length > 0" style="color: red;">Fyll i minst 4 bokstäver</p>
       </div>
-      <div class="input-group">
-        <input type="text" v-model="genreID" placeholder="Genre ID">
-        <p v-if="buttonClicked && isNaN(genreID)" style="color: red;">Måste innehålla ett ID</p>
-      </div>
+
       <div class="input-group">
         <button @click="validateAndAddGenre">Lägg till Genre</button>
       </div>
@@ -127,8 +124,8 @@ export default {
     async addGenre() {
       try {
         const genreData = {
-          genreName: this.newGenre,
-          genreId: this.genreID
+          genreName: this.newGenre
+          
         };
 
         const response = await fetch('http://localhost:3000/api/genres', {
@@ -141,7 +138,7 @@ export default {
 
         if (response.ok) {
           this.newGenre = '';
-          this.genreID = '';
+          
           console.log('Genre added successfully!');
         } else {
           console.error('Failed to add genre:', response.statusText);
@@ -162,8 +159,8 @@ export default {
 
           if (response.ok) {
             console.log(`Genre '${genreName}' (ID: ${genreId}) deleted successfully!`);
-            //this.selectedGenre = null; // Återställ vald genre till null
-            this.fetchGenres(); // Hämta genres på nytt efter borttagning
+            
+            this.fetchGenres(); 
            
           } else {
             const errorMessage = await response.text();
@@ -178,8 +175,8 @@ export default {
     },
     async updateGenre() {
       if (this.selectedGenre && this.updatedGenreName) {
-        const { genreId } = this.selectedGenre;
-        const url = `http://localhost:3000/api/genres/${genreId}`;
+        const { genreName } = this.selectedGenre;
+        const url = `http://localhost:3000/api/genres/${genreName}`;
 
         try {
           const response = await fetch(url, {
@@ -194,7 +191,7 @@ export default {
 
           if (response.ok) {
             console.log('Genre updated successfully!');
-            this.fetchGenres(); // Hämta genres på nytt efter uppdatering
+            this.fetchGenres(); 
             this.updatedGenreName = '';
           } else {
             const errorMessage = await response.text();
