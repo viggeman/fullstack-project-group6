@@ -134,7 +134,7 @@
 </script>
 
 <template>
-  <div>
+  <div class="container">
     <ul>
       <li v-for="item in writers">
         {{ item.writerName }}: ID {{ item.writerId }}
@@ -212,11 +212,13 @@
 <style scoped>
   /* Your component's CSS styles go here */
   .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    background-color: black;
+    background-image: radial-gradient(rgba(0, 150, 0, 0.75), black 120%);
     height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    padding: 2rem;
+    position: relative;
   }
   h1 {
     font-size: 24px;
