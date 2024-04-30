@@ -1,11 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const writersController = require('../controllers/writersController');
+const {
+  getWriters,
+  getWriter,
+  createWriter,
+  updateWriter,
+  deleteWriter,
+} = require('../controllers/writersController');
 
-router.get('/api/writers', writersController.getWriters);
-router.get('/api/writers/:id', writersController.getWriter);
-router.post('/api/writers', writersController.createWriter);
-router.put('/api/writers', writersController.updateWriter);
-router.delete('/api/writers', writersController.deleteWriter);
+router.get('/api/writers', getWriters);
+router.get('/api/writers/:id', getWriter);
+router.post('/api/writers', createWriter);
+router.put('/api/writers', updateWriter);
+router.delete('/api/writers', deleteWriter);
 
 module.exports = router;
