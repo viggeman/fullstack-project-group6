@@ -52,6 +52,21 @@ CREATE TABLE movieActors (
     FOREIGN KEY (actorAId) REFERENCES actors(actorId)
 );
 
+CREATE TABLE users(
+    userId INT NOT NULL AUTO_INCREMENT UNIQUE, -- FK to mongoDB
+    userName NOT NULL VARCHAR(50) UNIQUE,
+    userPassword NOT NULL VARCHAR(50),
+    userRole ENUM('admin', 'user') DEFAULT 'user',
+    userFavorites VARCHAR(50), -- MongoDB _id
+    PRIMARY KEY (userId)
+);
+
+-- Add users
+INSERT INTO users (userName, userPassword, userRole)
+VALUES ('admin', 'admin', 'admin'), ('admin1', 'admin1', 'admin'), ('user', 'user', 'user'), ('user2', 'user2', 'user'), ('user3', 'user3');
+
+INSERT INTO users (userName, userPassword) VALUES ('user', 'user'), ('user1', 'user1')
+
 -- Add genres
 INSERT INTO genres (genreName) VALUES ('Drama'), ('Comedy'), ('Sci-Fi'), ('Thriller'), ('Adventure'), ('Fantasy'), ('Romance'), ('Horror'), ('Animation'), ('Documentary');
 
