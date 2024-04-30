@@ -23,34 +23,33 @@ exports.getAllGenres = async (req, res) => {
 // Ny ändring, Ska bara finnas genreName. Lös detta.
 
 exports.postGenre = async (req, res) => {
-  const { genreName } = req.body; 
-
-  // Kolla om genreName är tomt eller för kort
-  if (!genreName || genreName.length < 4) {
-      return res.status(400).json({ error: "Genren måste innehålla minst 4 bokstäver." });
-  }
-
-  // Skapa SQL-frågan utan genreId
-  let sql = "INSERT INTO genres (genreName) VALUES (?)";
-  let params = [genreName];
+    const { genreName } = req.body; 
   
-  try {
-      await connectionMySQL.query(sql, params, (error, results) => {
-          if (error) {
-              throw error;
-          }
-          return res.status(201).json({
-              success: true,
-              error: "",
-              message: 'Du har lagt till en ny genre.'
-          });
-      });
-  } catch (error) {
-      return res.status(500).json({
-          success: false,
-          error: error.message
-      });
-  }
+    // Kolla om genreName är tomt eller för kort
+    if (!genreName || genreName.length < 4) {
+        return res.status(400).json({ error: "Genren måste innehålla minst 4 bokstäver." });
+    }
+  
+    let sql = "INSERT INTO genres (genreName) VALUES (?)";
+    let params = [genreName];
+    
+    try {
+        await connectionMySQL.query(sql, params, (error, results) => {
+            if (error) {
+                throw error;
+            }
+            return res.status(201).json({
+                success: true,
+                error: "",
+                message: 'Du har lagt till en ny genre.'
+            });
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
 };
 
   // Ta bort en genre, DELETE
@@ -87,10 +86,10 @@ exports.postGenre = async (req, res) => {
 
   exports.changeGenre = async (req, res) => {
     const { genreName } = req.body;
-   
+    const { genreId } = req.params; // Hämta genreId från URL-parametrar
 
     const sql = "UPDATE genres SET genreName = ? WHERE genreId = ?";
-    const params = [genreName];
+    const params = [genreName, genreId];
 
     try {
         if (!genreName || genreName.trim() === "") {
@@ -101,7 +100,7 @@ exports.postGenre = async (req, res) => {
         }
 
         // Logga värden för genreName och genreId för debuggning.
-   
+        console.log('Updating genre with genreId:', genreId);
         console.log('New genreName:', genreName);
 
         await connectionMySQL.query(sql, params);
