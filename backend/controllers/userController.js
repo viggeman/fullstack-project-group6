@@ -112,3 +112,67 @@ exports.deleteUser = async (req, res) => {
     return res.status(500).json('Internal Server Error: ' + error);
   }
 };
+
+exports.loginUser = async (req, res) => {
+  // Implement logic to login a user
+  const { userName, userPassword } = req.body;
+  let query = 'SELECT * FROM users WHERE userName = ? AND userPassword = ?';
+  if (!userName || userName === '') {
+    return res.status(400).json({
+      success: false,
+      message: 'Provide user name',
+    });
+  }
+  if (!userPassword || userPassword === '') {
+    return res.status(400).json({
+      success: false,
+      message: 'Provide user password',
+    });
+  }
+  try {
+    await connectionMySQL.query(
+      query,
+      [userName, userPassword],
+      (error, results) => {
+        if (error) throw error;
+        if (results.length === 0) {
+          return res.status(401).json({
+            success: false,
+            message: 'Invalid user name or password',
+          });
+        }
+        return res.json({
+          success: true,
+          message: 'User logged in successfully',
+          id: results[0].userId,
+          name: userName,
+        });
+      }
+    );
+  } catch (error) {
+    return res.status(500).json('Internal Server Error: ' + error);
+  }
+};
+exports.logoutUser = async (req, res) => {
+  // Implement logic to login a user
+  const { id } = req.body;
+  let query = 'SELECT * FROM users WHERE userId = ?';
+  try {
+    await connectionMySQL.query(query, [id], (error, results) => {
+      if (error) throw error;
+      if (results.length === 0) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid user ID',
+        });
+      }
+      return res.json({
+        success: true,
+        message: 'User logged out successfully',
+        id: results[0].userId,
+      });
+    });
+  } catch (error) {
+    return res.status(500).json('Internal Server Error: ' + error);
+  }
+};
