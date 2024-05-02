@@ -5,6 +5,7 @@ import FetchActor from '../view/FetchActor.vue';
 import FetchMovieActors from '../view/FetchMovieActors.vue';
 import FetchGenres from '../view/FetchGenres.vue';
 import Users from '../view/Users.vue';
+import UserLogin from '../view/UserLogin.vue';
 
 const routes = [
   { path: '/', component: Home },
@@ -13,6 +14,7 @@ const routes = [
   { path: '/fetch-movie-actor', component: FetchMovieActors },
   { path: '/fetch-genre', component: FetchGenres },
   { path: '/users', component: Users },
+  { path: '/user-login', component: UserLogin },
 ];
 
 const router = createRouter({
