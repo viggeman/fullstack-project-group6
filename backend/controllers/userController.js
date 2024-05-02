@@ -84,9 +84,9 @@ exports.createUser = async (req, res) => {
 };
 
 // DELETE method to delete a user by ID
-exports.deleteUser = (req, res) => {
+exports.deleteUser = async (req, res) => {
   // Implement logic to delete a user by ID
-  const { id } = req.params;
+  const { id } = req.body;
   if (isNaN(id)) {
     return res.status(400).json({
       success: false,
@@ -95,7 +95,7 @@ exports.deleteUser = (req, res) => {
   }
   let query = 'DELETE FROM users WHERE userId = ?';
   try {
-    connectionMySQL.query(query, [id], (error, results) => {
+    await connectionMySQL.query(query, [id], (error, results) => {
       if (error) throw error;
       if (results.affectedRows === 0) {
         return res.status(404).json({
