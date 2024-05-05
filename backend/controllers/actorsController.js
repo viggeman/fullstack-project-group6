@@ -1,4 +1,6 @@
+const util = require('util');
 const connectionMySQL = require('../connectionMySQL');
+const queryAsync = util.promisify(connectionMySQL.query).bind(connectionMySQL);
 
 // Get an actor by id
 exports.getActor = async (req, res) => {
@@ -50,14 +52,13 @@ exports.createActor = async (req, res) => {
         });
     }
     try {
-        await connectionMySQL.query(query, [actorName], (error, results) => {
-            if (error) throw error;
-            return res.status(201).json({
-                success: true,
-                message: 'POST actor successfull',
-                id: results.insertId,
-                name: actorName,
-            });
+        const results = await queryAsync(query, [actorName]);
+        const lastInsertId = results.insertId;
+        return res.status(201).json({
+            success: true,
+            message: 'POST actor successful',
+            actorId: lastInsertId,
+            name: actorName,
         });
     } catch (error) {
         return res.status(500).json('Internal Server Error: ' + error);
