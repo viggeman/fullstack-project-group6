@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container">
         <div class="actor-section">
             <h1>Show actor's movies</h1>
             <p v-if="errors.deleteError" class="error-message">
@@ -342,8 +342,8 @@ export default {
         0deg,
         rgba(255, 255, 255, 0.15),
         rgba(255, 255, 255, 0.15) 1px,
-        transparent 1px,
-        transparent 2px
+        transparent 4px,
+        transparent 4px
     );
     pointer-events: none;
 }

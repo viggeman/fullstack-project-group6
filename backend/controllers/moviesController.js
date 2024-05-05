@@ -1,4 +1,6 @@
+const util = require('util');
 const connectionMySQL = require('../connectionMySQL');
+const queryAsync = util.promisify(connectionMySQL.query).bind(connectionMySQL);
 
 // Get a movie by id
 exports.getMovie = async (req, res) => {
@@ -49,6 +51,10 @@ exports.createMovie = async (req, res) => {
         writerWId,
         directorDId,
     } = req.body;
+
+    // Lägg till en variabel för det senaste infogade ID:t
+    let lastInsertId;
+
     let query =
         'INSERT INTO movies (movieName, movieReleaseYear, imdbId, genreGId, writerWId, directorDId) VALUES (?, ?, ?, ?, ?, ?)';
     if (!movieName || movieName === '') {
@@ -57,32 +63,33 @@ exports.createMovie = async (req, res) => {
             message: 'Provide movie name',
         });
     }
+
     try {
-        await connectionMySQL.query(
-            query,
-            [
-                movieName,
-                movieReleaseYear,
-                imdbId,
-                genreGId,
-                writerWId,
-                directorDId,
-            ],
-            (error, results) => {
-                if (error) throw error;
-                return res.status(201).json({
-                    success: true,
-                    message: 'POST movie successful',
-                    id: results.insertId,
-                    name: movieName,
-                    releaseYear: movieReleaseYear,
-                    imdbId: imdbId,
-                    genreGId: genreGId,
-                    writerWId: writerWId,
-                    directorDId: directorDId,
-                });
-            }
-        );
+        const results = await queryAsync(query, [
+            movieName,
+            movieReleaseYear,
+            imdbId,
+            genreGId,
+            writerWId,
+            directorDId,
+        ]);
+
+        // Hämta det senaste infogade ID:t från resultaten
+        if (results && results.insertId) {
+            lastInsertId = results.insertId;
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: 'POST movie successful',
+            movieId: lastInsertId,
+            name: movieName,
+            releaseYear: movieReleaseYear,
+            imdbId: imdbId,
+            genreGId: genreGId,
+            writerWId: writerWId,
+            directorDId: directorDId,
+        });
     } catch (error) {
         return res.status(500).json('Internal Server Error: ' + error);
     }
