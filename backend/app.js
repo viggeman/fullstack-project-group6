@@ -23,6 +23,7 @@ const genresRoutes = require('./routes/genresRoutes');
 const moviesRoutes = require('./routes/moviesRoutes');
 const directorsRoutes = require('./routes/directorsRoutes');
 const composersRoutes = require('./routes/composersRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
@@ -33,6 +34,7 @@ app.use(genresRoutes);
 app.use(moviesRoutes);
 app.use(directorsRoutes);
 app.use(composersRoutes);
+app.use(userRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 ('');

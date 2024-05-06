@@ -1,4 +1,18 @@
-<script></script>
+<script setup>
+  import { useUserStore } from '../stores/userStore';
+  import { ref, onMounted, watch } from 'vue';
+
+  const userStore = useUserStore();
+  const isLoggedIn = ref(userStore.isLoggedIn);
+
+  userStore.$subscribe(() => {
+    isLoggedIn.value = userStore.isLoggedIn;
+  });
+
+  const handleLogout = () => {
+    userStore.logout();
+  };
+</script>
 
 <style>
   .header {
@@ -44,11 +58,14 @@
       <ul class="menu-col1">
         <li><router-link to="/fetch-movie-actor">MovieActors</router-link></li>
         <li><router-link to="/fetch-writer">Writers</router-link></li>
-        <li><router-link to="/fetch-actor">Actor</router-link></li>
+        <li><router-link to="/fetch-actor">Actors</router-link></li>
+        <li><router-link to="/fetch-genre">Genres</router-link></li>
+        <li><router-link to="/users">Users</router-link></li>
       </ul>
     </nav>
     <nav class="login-nav">
-      <p>Log In</p>
+      <router-link v-if="!isLoggedIn" to="/user-login">Log In</router-link>
+      <button v-else @click="handleLogout">Logout</button>
     </nav>
   </header>
 </template>

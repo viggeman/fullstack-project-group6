@@ -26,8 +26,8 @@ exports.postGenre = async (req, res) => {
   
     // Ett vilkor
 
-    if (!genreName || genreName.length < 4) {
-        return res.status(400).json({ error: "Genren måste innehålla mer än 4 bokstäver" });
+    if (!genreName || genreName.length < 4 || !genreId || isNaN(genreId)) {
+        return res.status(400).json({ error: "Genren måste innehålla mer än 4 bokstäver och ett giltigt genreId" });
       }
   
     // Skapar SQL Frågan
@@ -56,17 +56,20 @@ exports.postGenre = async (req, res) => {
 
   exports.deleteOneGenre = async (req, res) => {
     const { genreId } = req.params;
-  
+
     if (!genreId) {
       return res.status(400).json({
         success: false,
         error: 'Du måste välja ett ID-nummer för att ta bort en genre.'
       });
     }
-  
-    const sql = "DELETE FROM genres WHERE genreId = ?";
+
     try {
-      await connectionMySQL.query(sql, [genreId]);
+   
+      // Radera Genren.
+      const deleteGenreQuery = "DELETE FROM genres WHERE genreId = ?";
+      await connectionMySQL.query(deleteGenreQuery, [genreId]);
+
       res.status(200).json({
         success: true,
         message: "En Genre är borttagen!"
@@ -77,31 +80,41 @@ exports.postGenre = async (req, res) => {
         error: error.message
       });
     }
-  };
+};
 
   // Ändra en Genre, PUT
 
-exports.changeGenre = async (req, res) =>{
-    const { genreName, genreId } = req.body;
-    const sql = "UPDATE genres SET genreName = ? WHERE genreId = ?"
-    const params = [genreName , genreId]
+  exports.changeGenre = async (req, res) => {
+    const { genreName } = req.body;
+    const { genreId } = req.params; // Hämta genreId från URL-parametrar
 
-    if(!genreId || !genreName){
-        return res.status(400).json({
-            success: false,
-            error: 'Genren måste ha ett namn och ett ID'
-        })
-    }
-    try{
+    const sql = "UPDATE genres SET genreName = ? WHERE genreId = ?";
+    const params = [genreName, genreId];
+
+    try {
+        if (!genreName || genreName.trim() === "") {
+            return res.status(400).json({
+                success: false,
+                error: 'Genre måste ha ett namn'
+            });
+        }
+
+        // Logga värden för genreName och genreId för debuggning.
+        console.log('Updating genre with genreId:', genreId);
+        console.log('New genreName:', genreName);
+
         await connectionMySQL.query(sql, params);
+
         res.status(200).json({
             success: true,
-            message: 'En genre har uppdaterats!'
-        })
-    }catch(error){
+            message: 'Genrenamn har uppdaterats!'
+        });
+    } catch (error) {
+    
+        console.error('Error updating genre:', error);
         res.status(500).json({
             success: false,
-            error: error.message
-        })
+            error: 'Det uppstod ett fel vid uppdatering av genrenamn'
+        });
     }
-}
+};
