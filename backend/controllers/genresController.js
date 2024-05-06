@@ -55,7 +55,7 @@ exports.postGenre = async (req, res) => {
   // Ta bort en genre, DELETE
 
   exports.deleteOneGenre = async (req, res) => {
-    const { genreId } = req.params;
+    const { genreId } = req.body;
 
     if (!genreId) {
       return res.status(400).json({
@@ -65,7 +65,7 @@ exports.postGenre = async (req, res) => {
     }
 
     try {
-   
+      
       // Radera Genren.
       const deleteGenreQuery = "DELETE FROM genres WHERE genreId = ?";
       await connectionMySQL.query(deleteGenreQuery, [genreId]);
@@ -85,9 +85,8 @@ exports.postGenre = async (req, res) => {
   // Ändra en Genre, PUT
 
   exports.changeGenre = async (req, res) => {
-    const { genreName } = req.body;
-    const { genreId } = req.params; // Hämta genreId från URL-parametrar
-
+    const { genreName, genreId } = req.body;
+    
     const sql = "UPDATE genres SET genreName = ? WHERE genreId = ?";
     const params = [genreName, genreId];
 

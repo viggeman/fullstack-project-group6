@@ -5,91 +5,36 @@
     <img src="../pictures/Movie-Genres-Types-of-Movies-List-of-Genres-and-Categories-Featured.jpg" alt="movie">
     </div>
    <div class="container">
-    <form @submit.prevent="submitForm" class="form">
+    <h1>GENRE</h1>
+     <div>
+      <button @click="fetchGenres">Hämta Genres</button>
+      <div v-if="genres.length > 0">
+        <h2>Lista med Genres:</h2>
+        <ul>
+          <li v-for="genre in genres" :key="genre.genreId">{{ genre.genreName }} {{ genre.genreId }}</li>
+          <input type="text" v-model="deleteOneGenre" @input="validateInput" placeholder="Delete by ID">
+          <button @click="deleteGenre" :disabled="!isValidGenreId">Delete</button>
 
-      <h2>Genre</h2>
-      <div class="input-group">
-        <input type="text" v-model="newGenre" placeholder="Genre Namn">
-        <p v-if="newGenre.length < 4 && newGenre.length > 0" style="color: red;">Fyll i minst 4 bokstäver</p>
+          <p v-if="deleteOneGenre && !isValidGenreId" style="color: red;">Endast siffror tillåtna.</p>
+        </ul>
       </div>
+     </div>
 
-      <div class="input-group">
-        <button @click="validateAndAddGenre">Lägg till Genre</button>
-      </div>
-      
+     <div>
+      <input type="text" v-model="newGenreName" placeholder="Add a genre">
+      <button @click="addGenre">Add Genre</button>
+     </div>
+     
 
-      <div class="form-group">
-        <button class="fetch-button" @click="fetchGenres">Hämta Genres</button>
-        <select class="genre-select" v-if="genres.length > 0" v-model="selectedGenre">
-          <option v-for="genre in genres" :key="genre.id" :value="genre">{{ genre.genreName }} (ID: {{ genre.genreId }})</option>
-        </select>
-      </div>
-      <div class="delete">
-        <button class="fetch-button" @click="deleteGenre">Ta bort</button>
-      </div>
+     <div>
+      <p>Lets Change A Genre</p>
+      <input type="text" v-model="newGenreId" placeholder="Enter ID">
+      <input type="text" v-model="updateAGenre" placeholder="Update a Genre">
+      <button @click="updateGenre">Update</button>
+    </div>
 
-      <div class="put">
-        <input type="text" v-model="updatedGenreName" placeholder="Nytt Genre Namn">
-        <button class="fetch-button" @click="updateGenre">Ändra</button>
-      </div>
-
-    </form>
+   </div>
   </div>
-</div>
-<div class="container2">
-  <div class="paragraphs">
-  <h2>Drama</h2>
-  <p>
-In the hushed stillness of fading light,
-Moments linger, charged with emotion bright.
-Silent tears, words unspoken,
-A heart's journey, raw and unbroken.
-Drama unfolds in whispers deep,
-Where souls collide and secrets keep.</p>
-</div>
-
-<div class="paragraphs">
-  <h2>Action</h2>
-  <p>
-    Thunderous beats of adrenaline's roar,
-Heroes rise on an epic score.
-Fists of fury, danger's call,
-Echoes of battles that shake the walls.
-Explosions blaze across the sky,
-In the realm where courage does fly.</p>
-</div>
-
-<div class="paragraphs">
-  <h2>Romance</h2>
-  <p>
-    Soft whispers beneath a starlit sky,
-Two souls meet, hearts soaring high.
-A dance of glances, a touch so sweet,
-Love's tender embrace, a timeless feat.
-In every heartbeat, a tale unfolds,
-Of love's enduring, magical holds.</p>
-</div>
-
-<div class="paragraphs">
-  <h2>Comedy</h2>
-  <p>
-    Laughter erupts in waves of delight,
-Where jokes and mischief take flight.
-Quirky characters, antics bold,
-A world of humor, a joy to behold.
-In the realm of smiles, worries flee,
-As laughter reigns, wild and free.</p>
-</div>
-<div class="paragraphs">
-  <h2>Horror</h2>
-  <p>
-    In shadows' realm where fears take flight,
-Ghosts whisper, haunting the night.
-Echoes in silence, darkness deep,
-Unseen steps on floors that creak.
-  </p>
-</div>
-</div>
 
 </template>
 
@@ -98,119 +43,112 @@ export default {
   data() {
     return {
       genres: [],
-      selectedGenre: null,
-      newGenre: "",
-      genreID: "",
-      buttonClicked: false,
-      updatedGenreName: ""
+      newGenreName: "",
+      deleteOneGenre: "",
+      isValidGenreId: false,
+      newGenreId: "",
+      updateAGenre: ""
+
     };
   },
   methods: {
-    async fetchGenres() {
-      try {
-        const response = await fetch('http://localhost:3000/api/genres');
-        const jsonData = await response.json();
-        this.genres = jsonData.sort((a, b) => a.genreName.localeCompare(b.genreName));
-      } catch (error) {
-        console.error('Error fetching genres:', error);
-      }
+  async fetchGenres() {
+    console.log('Knappen nedtryckt');
+    try {
+      const response = await fetch('http://localhost:3000/api/genres');
+      const jsonData = await response.json();
+      this.genres = jsonData;
+      
+    } catch (error) {
+      console.error('Error fetching genres:', error);
+    }
+  },
+  validateInput() {
+      this.isValidGenreId = /^\d+$/.test(this.deleteOneGenre.trim());
     },
-    validateAndAddGenre() {
-      this.buttonClicked = true;
-      if (this.newGenre.length >= 4 && this.genreID.trim() !== "") {
-        this.addGenre();
-      }
-    },
-    async addGenre() {
-      try {
-        const genreData = {
-          genreName: this.newGenre
-          
-        };
+  async addGenre() {
+  console.log('Added');
+  
+  try {
+    const response = await fetch('http://localhost:3000/api/genres', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({ genreName: this.newGenreName })
+    });
+    const newGenre = await response.json();
+    this.genres.push(newGenre); 
+    this.newGenreName = ""; // Rensa inputfältet
+    console.log('Genre added:', newGenre);
 
-        const response = await fetch('http://localhost:3000/api/genres', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(genreData)
-        });
-
-        if (response.ok) {
-          this.newGenre = '';
-          
-          console.log('Genre added successfully!');
-        } else {
-          console.error('Failed to add genre:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error adding genre:', error);
-      }
-    },
-    async deleteGenre() {
-      if (this.selectedGenre) {
-        const { genreId, genreName } = this.selectedGenre;
-        const url = `http://localhost:3000/api/genres/${genreId}`;
-
-        try {
-          const response = await fetch(url, {
-            method: 'DELETE'
-          });
-
-          if (response.ok) {
-            console.log(`Genre '${genreName}' (ID: ${genreId}) deleted successfully!`);
-            
-            this.fetchGenres(); 
-           
-          } else {
-            const errorMessage = await response.text();
-            console.error('Failed to delete genre:', errorMessage);
-          }
-        } catch (error) {
-          console.error('Error deleting genre:', error);
-        }
-      } else {
-        console.warn('Vänligen välj en genre att ta bort.');
-      }
-    },
-    async updateGenre() {
-      if (this.selectedGenre && this.updatedGenreName) {
-        const { genreName } = this.selectedGenre;
-        const url = `http://localhost:3000/api/genres/${genreName}`;
-
-        try {
-          const response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              genreName: this.updatedGenreName
-            })
-          });
-
-          if (response.ok) {
-            console.log('Genre updated successfully!');
-            this.fetchGenres(); 
-            this.updatedGenreName = '';
-          } else {
-            const errorMessage = await response.text();
-            console.error('Failed to update genre:', errorMessage);
-          }
-        } catch (error) {
-          console.error('Error updating genre:', error);
-        }
-      } else {
-        console.warn('Vänligen välj en genre och ange det nya genrenamnet.');
-      }
-    },
+  } catch (error) {
+    console.error('Error adding genre:', error);
   }
-};
+},
 
+async deleteGenre(){
+  const genreId = this.deleteOneGenre.trim();
+  console.log('DELETE', genreId)
+
+  if(!genreId){
+    console.log('Genre måste vara ifyllt');
+    return
+  }
+
+  try{
+    const response = await fetch('http://localhost:3000/api/genres',{
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ genreId })
+    })
+    if(response.ok){
+      console.log(`Genre with ${genreId} has been removed`)
+      this.deleteOneGenre = '';
+    }else{
+      console.log(`Failed to remove with ID ${genreId}`)
+    }
+  }catch(error){
+    console.log('Error deleting', error)
+  }
+},
+async updateGenre() {
+  console.log('Uppdaterar');
+  
+  try {
+    const response = await fetch('http://localhost:3000/api/genres', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        genreId: this.newGenreId,
+        genreName: this.updateAGenre
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log(`Genren med ID ${this.newGenreId} har uppdaterats till "${this.updateAGenre}"`);
+      this.newGenreId = '';
+      this.updateAGenre = '';
+    } else {
+      console.error(`Misslyckades att uppdatera genren: ${data.error}`);
+    }
+  } catch (error) {
+    console.error('Fel vid uppdatering av genren:', error);
+  }
+}
+
+}
+
+};
 </script>
 
   <style scoped>
-
 
   .page {
     background-color: #dfb1b1; 
