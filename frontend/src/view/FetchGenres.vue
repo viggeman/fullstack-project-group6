@@ -5,32 +5,36 @@
     <img src="../pictures/Movie-Genres-Types-of-Movies-List-of-Genres-and-Categories-Featured.jpg" alt="movie">
     </div>
    <div class="container">
-    <h1>GENRE</h1>
+    <h1 style="color: whitesmoke">GENRE</h1>
      <div>
       <button @click="fetchGenres">Hämta Genres</button>
       <div v-if="genres.length > 0">
-        <h2>Lista med Genres:</h2>
+        <h2 style="color: whitesmoke">Lista med Genres:</h2>
         <ul>
           <li v-for="genre in genres" :key="genre.genreId">{{ genre.genreName }} {{ genre.genreId }}</li>
           <input type="text" v-model="deleteOneGenre" @input="validateInput" placeholder="Delete by ID">
           <button @click="deleteGenre" :disabled="!isValidGenreId">Delete</button>
 
-          <p v-if="deleteOneGenre && !isValidGenreId" style="color: red;">Endast siffror tillåtna.</p>
+          <p v-if="deleteOneGenre && !isValidGenreId" style="color: red;">Only numbers allowed.</p>
+          <p v-if="genreDeleted" style="color: greenyellow;">You deleted a genre.</p>
         </ul>
+        <div>
+      <input type="text" v-model="newGenreName" placeholder="Add a genre">
+      <button @click="addGenre">Add Genre</button>
+      <p v-if="addedGenre" style="color: greenyellow">You've added a genre.</p>
+     </div>
       </div>
      </div>
 
-     <div>
-      <input type="text" v-model="newGenreName" placeholder="Add a genre">
-      <button @click="addGenre">Add Genre</button>
-     </div>
-     
 
+     
      <div>
       <p>Lets Change A Genre</p>
       <input type="text" v-model="newGenreId" placeholder="Enter ID">
       <input type="text" v-model="updateAGenre" placeholder="Update a Genre">
       <button @click="updateGenre">Update</button>
+      <p v-if="updatedOneGenre" style="color: greenyellow">Updated a genre</p>
+
     </div>
 
    </div>
@@ -47,7 +51,10 @@ export default {
       deleteOneGenre: "",
       isValidGenreId: false,
       newGenreId: "",
-      updateAGenre: ""
+      updateAGenre: "",
+      genreDeleted: false,
+      addedGenre: false,
+      updatedOneGenre: false
 
     };
   },
@@ -57,6 +64,7 @@ export default {
     try {
       const response = await fetch('http://localhost:3000/api/genres');
       const jsonData = await response.json();
+      jsonData.sort((a, b) => a.genreName.localeCompare(b.genreName));
       this.genres = jsonData;
       
     } catch (error) {
@@ -79,6 +87,8 @@ export default {
     });
     const newGenre = await response.json();
     this.genres.push(newGenre); 
+    
+    this.addedGenre = true;
     this.newGenreName = ""; // Rensa inputfältet
     console.log('Genre added:', newGenre);
 
@@ -87,33 +97,44 @@ export default {
   }
 },
 
-async deleteGenre(){
+async deleteGenre() {
   const genreId = this.deleteOneGenre.trim();
-  console.log('DELETE', genreId)
+  console.log('DELETE', genreId);
 
-  if(!genreId){
-    console.log('Genre måste vara ifyllt');
-    return
+  if (!genreId) {
+    console.log('Genre ID måste vara ifyllt.');
+    return;
   }
 
-  try{
-    const response = await fetch('http://localhost:3000/api/genres',{
+  try {
+    // Kontrollera om genren med angivet ID finns innan borttagning
+    //const checkResponse = await fetch(`http://localhost:3000/api/genres/${genreId}`);
+    //if (!checkResponse.ok) {
+      //console.log(`Genre med ID ${genreId} hittades inte. Borttagning avbruten.`);
+      //return;
+   // }
+
+    // Om genren finns, fortsätt med att utföra borttagningen
+    const deleteResponse = await fetch('http://localhost:3000/api/genres', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ genreId })
-    })
-    if(response.ok){
-      console.log(`Genre with ${genreId} has been removed`)
+    });
+
+    if (deleteResponse.ok) {
+      console.log(`Genre med ID ${genreId} har tagits bort.`);
+      this.genreDeleted = true;
       this.deleteOneGenre = '';
-    }else{
-      console.log(`Failed to remove with ID ${genreId}`)
+    } else {
+      console.log(`Misslyckades med att ta bort genren med ID ${genreId}.`);
     }
-  }catch(error){
-    console.log('Error deleting', error)
+  } catch (error) {
+    console.log('Fel vid borttagning av genre:', error);
   }
 },
+
 async updateGenre() {
   console.log('Uppdaterar');
   
@@ -130,9 +151,10 @@ async updateGenre() {
     });
 
     const data = await response.json();
-
+  
     if (response.ok) {
       console.log(`Genren med ID ${this.newGenreId} har uppdaterats till "${this.updateAGenre}"`);
+      this.updatedOneGenre = true;
       this.newGenreId = '';
       this.updateAGenre = '';
     } else {
@@ -149,129 +171,75 @@ async updateGenre() {
 </script>
 
   <style scoped>
-
-  .page {
-    background-color: #dfb1b1; 
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start; 
-    height: 100vh; 
-    box-sizing: border-box; 
-  }
-
-
-.container {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(61, 39, 90, 0.2); 
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #574040;
   padding: 20px;
-  border-radius: 5px;
-  max-width: 600px;
-  top: 35%; 
-  left: 35%;  
+  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.container2 {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    
-    background-color: #dfb1b1; 
-    min-height: 80vh;
-  }
-
-  .image-container{
-    width: 100%;
-    max-height: 250px; 
-    overflow: hidden; 
-  }
-  .paragraphs {
-    width: calc(50% - 20px); 
-    margin-top: 20px;
-    margin-bottom: 20px; 
-    padding: 20px; 
-    border-radius: 5px; 
-    box-sizing: border-box; 
-  }
-
-  .paragraphs h2 {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
-    margin-bottom: 10px;
-  }
-
-  
-  .paragraphs p {
-    font-size: 16px;
-    line-height: 1.5;
-    color: #333;
-  }
-
-.cover-input-group{
-  border: solid white 2px;
-  
+/* Styling för bild */
+.image-container {
+  text-align: center;
 }
-.form-group {
-  margin-bottom: 20px;
+.image-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.fetch-button {
-  margin: 10px;
+/* Styling för container */
+.container {
+  margin-top: 20px;
+}
+
+/* Styling för rubriker */
+h1, h2, p {
+  color: #333;
+}
+
+/* Styling för knappar */
+button {
+  margin: 3px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Styling för listor */
+ul {
+  padding-left: 0;
+}
+
+/* Styling för input-fält */
+input[type="text"] {
+  width: calc(100% - 130px);
   padding: 10px;
   font-size: 16px;
-  background-color: #523e52;
-  color: #000000;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 150px; /* Anpassa bredden efter behov */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+input[type="text"]:focus {
+  outline: none;
+  border-color: #007bff;
 }
 
-
-.genre-select {
-  margin: 10px;
-  padding: 5px;
-  font-size: 16px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
+/* Styling för felmeddelanden */
+p.error-message {
+  color: red;
 }
-
-.input-group {
-  margin: 25px 0; /* Justera övre och nedre marginalen efter behov */
-  border: solid black 2 px;
-}
-
-.input-group input {
-  margin-bottom: 20px; /* Öka avståndet mellan input-fälten */
-  padding: 15px; /* Justera kudden för input-fälten efter behov */
-  font-size: 16px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-}
-
-.input-group button {
-  margin-top: 20px; /* Öka avståndet mellan input-fälten och knappen */
-  padding: 15px 30px; /* Justera kudden för knappen efter behov */
-  font-size: 16px;
-  background-color: #28a745;
-  color: #000000;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.input-group button:hover {
-  background-color: #218838;
-}
-
-h2{
-  font-size: 4rem;
-  color: rgb(0, 0, 0);
-}
-
   </style>
   

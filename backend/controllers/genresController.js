@@ -91,10 +91,10 @@ exports.postGenre = async (req, res) => {
     const params = [genreName, genreId];
 
     try {
-        if (!genreName || genreName.trim() === "") {
+        if (!genreName || genreName.trim() === "" || isNaN(genreId)) {
             return res.status(400).json({
                 success: false,
-                error: 'Genre måste ha ett namn'
+                error: 'Genre måste ha ett namn och ett ID'
             });
         }
 
