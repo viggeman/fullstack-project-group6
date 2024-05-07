@@ -67,6 +67,7 @@
         <li><router-link to="/fetch-actor">Actors</router-link></li>
         <li><router-link to="/fetch-genre">Genres</router-link></li>
         <li><router-link to="/users">Users</router-link></li>
+        <li><router-link to="/fetch-movie">Movies</router-link></li>
       </ul>
     </nav>
     <nav class="login-nav">
