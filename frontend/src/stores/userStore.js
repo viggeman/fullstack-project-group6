@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
+import { fetchData, postData, putData, deleteData } from '../services/crud.js';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     isLoggedIn: false,
     userId: null,
     userName: null,
+    favoriteMovies: [],
   }),
   actions: {
     login(userId, userName) {
