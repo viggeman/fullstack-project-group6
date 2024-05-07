@@ -1,7 +1,5 @@
-// Import necessary modules and dependencies
 const connectionMySQL = require('../connectionMySQL');
 
-// GET method to fetch all users
 exports.getUsers = async (req, res) => {
   let query = 'SELECT * FROM users';
   try {

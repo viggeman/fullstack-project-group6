@@ -19,21 +19,24 @@
     success: null,
     message: '',
   });
-  const isLoggedIn = ref(null);
-  const userId = ref(null);
-  const userName = ref(null);
 
-  onMounted(async () => {
+  const userData = JSON.parse(localStorage.getItem('userData'));
+
+  const isLoggedIn = userData ? ref(userData.isLoggedIn) : ref(false);
+  const userId = userData ? ref(userData.userId) : ref(null);
+  const userName = userData ? ref(userData.userName) : ref('');
+  console.log(isLoggedIn.value);
+
+  userStore.$subscribe(() => {
     isLoggedIn.value = userStore.isLoggedIn;
-    userId.value = userStore.getUserId;
-    userName.value = userStore.getUserName;
+    console.log(isLoggedIn.value);
   });
 
-  watch(response, () => {
-    isLoggedIn.value = userStore.isLoggedIn;
-    userId.value = userStore.getUserId;
-    userName.value = userStore.getUserName;
-  });
+  // onMounted(async () => {
+  //   isLoggedIn.value = userStore.isLoggedIn;
+  //   userId.value = userStore.getUserId;
+  //   userName.value = userStore.getUserName;
+  // });
 
   const setResponse = (data, msg) => {
     response.value = {
@@ -72,6 +75,7 @@
   const handleLogout = () => {
     userStore.logout();
     setResponse({ success: true, message: 'Logged out' });
+    isLoggedIn.value = false;
     console.log(userStore.getIsLoggedIn);
   };
 </script>
