@@ -1,60 +1,60 @@
 <script setup>
-  import { useUserStore } from '../stores/userStore';
-  import { ref, onMounted, watch, computed } from 'vue';
+import { useUserStore } from '../stores/userStore';
+import { ref, onMounted, watch, computed } from 'vue';
 
-  const userStore = useUserStore();
-  const userData = JSON.parse(localStorage.getItem('userData'));
+const userStore = useUserStore();
+const userData = JSON.parse(localStorage.getItem('userData'));
 
-  const isLoggedIn = userData ? ref(userData.isLoggedIn) : ref(false);
-  console.log(isLoggedIn.value);
+const isLoggedIn = userData ? ref(userData.isLoggedIn) : ref(false);
+console.log(isLoggedIn.value);
 
-  userStore.$subscribe(() => {
+userStore.$subscribe(() => {
     isLoggedIn.value = userStore.isLoggedIn;
     console.log(isLoggedIn.value);
-  });
+});
 
-  const handleLogout = () => {
+const handleLogout = () => {
     userStore.logout();
     isLoggedIn.value = false;
     console.log('logga ut');
-  };
+};
 </script>
 
 <style>
-  .header {
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
+}
 
-  .main-nav {
+.main-nav {
     display: flex;
     align-items: center;
     height: 7rem;
     margin-left: 2rem;
-  }
+}
 
-  .login-nav {
+.login-nav {
     display: flex;
     align-items: center;
     height: 7rem;
     margin-right: 2rem;
     color: black;
-  }
+}
 
-  .menu-col1 {
+.menu-col1 {
     display: flex;
     list-style: none;
     margin-left: 4rem;
-  }
+}
 
-  .menu-col1 li {
+.menu-col1 li {
     margin-right: 4rem;
-  }
+}
 
-  .menu-col1 li:last-child {
+.menu-col1 li:last-child {
     margin-right: 0;
-  }
+}
 </style>
 
 <template>
