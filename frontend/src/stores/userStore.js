@@ -21,25 +21,17 @@ export const useUserStore = defineStore('user', {
           userName: this.userName,
         })
       );
+      window.location.href = '/user-page';
     },
     logout() {
       this.isLoggedIn = false;
       this.userId = null;
       this.userName = null;
       localStorage.removeItem('userData');
+      window.location.href = '/user-login';
     },
   },
   getters: {
-    created() {
-      this.$onAction('login', () => {
-        console.log('User logged in!');
-        // Perform actions upon login (optional)
-      });
-      this.$onAction('logout', () => {
-        console.log('User logged out!');
-        // Perform actions upon logout (optional)
-      });
-    },
     getIsLoggedIn() {
       return {
         isLoggedIn: this.isLoggedIn,

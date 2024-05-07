@@ -1,0 +1,24 @@
+use backendGrupp6;
+db.createCollection("favoritemovies");
+
+db.favoritemovies.insertOne({
+    userId: "1",
+    favoriteListTitle: "Testing first list",
+    movies: [
+        {movieId: "1"},
+        {movieId: "2"},
+        {movieId: "3"},
+    ]
+});
+
+db.favoritemovies.insertOne({
+    userId: "2",
+    favoriteListTitle: "Testing second list",
+    movies: [
+        {movieId: "3"},
+        {movieId: "5"},
+        {movieId: "4"},
+    ]
+});
+
+db.favoritemovies.find();
