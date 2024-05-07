@@ -9,9 +9,9 @@ router.get('/api/genres', genresController.getAllGenres);
 router.post('/api/genres', genresController.postGenre);
 
 // DELETE - Ta bort en Genre.
-router.delete('/api/genres/:genreId', genresController.deleteOneGenre);
+router.delete('/api/genres', genresController.deleteOneGenre);
 
 // PUT - Ändra Genre.
-router.put('/api/genres/:genreId', genresController.changeGenre);
+router.put('/api/genres', genresController.changeGenre);
 
 module.exports = router;
