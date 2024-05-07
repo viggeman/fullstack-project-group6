@@ -32,12 +32,6 @@
     console.log(isLoggedIn.value);
   });
 
-  // onMounted(async () => {
-  //   isLoggedIn.value = userStore.isLoggedIn;
-  //   userId.value = userStore.getUserId;
-  //   userName.value = userStore.getUserName;
-  // });
-
   const setResponse = (data, msg) => {
     response.value = {
       success: data.success,
@@ -76,6 +70,7 @@
     userStore.logout();
     setResponse({ success: true, message: 'Logged out' });
     isLoggedIn.value = false;
+    // location.reload();
     console.log(userStore.getIsLoggedIn);
   };
 </script>

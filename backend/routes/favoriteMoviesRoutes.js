@@ -18,5 +18,9 @@ router.delete(
   '/api/favorite-movies/:id/movies/:movieId',
   favoriteMovieController.removeMovie
 );
+router.delete(
+  '/api/favorite-movies/:id',
+  favoriteMovieController.deleteFavoriteList
+);
 
 module.exports = router;
