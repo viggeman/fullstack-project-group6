@@ -21,11 +21,12 @@
   });
 
   const userData = JSON.parse(localStorage.getItem('userData'));
-
-  const isLoggedIn = userData ? ref(userData.isLoggedIn) : ref(false);
-  const userId = userData ? ref(userData.userId) : ref(null);
-  const userName = userData ? ref(userData.userName) : ref('');
-  console.log(isLoggedIn.value);
+  if (userData) {
+    console.log('userdata', userData);
+    isLoggedIn.value = userData.isLoggedIn;
+    uId.value = userData.userId;
+    userName.value = userData.userName;
+  }
 
   userStore.$subscribe(() => {
     isLoggedIn.value = userStore.isLoggedIn;
@@ -70,7 +71,6 @@
     userStore.logout();
     setResponse({ success: true, message: 'Logged out' });
     isLoggedIn.value = false;
-    // location.reload();
     console.log(userStore.getIsLoggedIn);
   };
 </script>
