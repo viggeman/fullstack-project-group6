@@ -20,42 +20,42 @@ exports.getAllGenres = async (req, res) => {
 };
 
 // Lägg till en Genre, POST
+// Ny ändring, Ska bara finnas genreName. Lös detta.
 
 exports.postGenre = async (req, res) => {
-    const { genreName, genreId } = req.body; 
+    const { genreName } = req.body; 
   
-    // Ett vilkor
-
-    if (!genreName || genreName.length < 4 || !genreId || isNaN(genreId)) {
-        return res.status(400).json({ error: "Genren måste innehålla mer än 4 bokstäver och ett giltigt genreId" });
-      }
+    // Kolla om genreName är tomt eller för kort
+    if (!genreName || genreName.length < 4) {
+        return res.status(400).json({ error: "Genren måste innehålla minst 4 bokstäver." });
+    }
   
-    // Skapar SQL Frågan
-    let sql = "INSERT INTO genres (genreName, genreId) VALUES (?,?)";
-    let params = [genreName, genreId]
+    let sql = "INSERT INTO genres (genreName) VALUES (?)";
+    let params = [genreName];
+    
     try {
-      await connectionMySQL.query(sql, params,(error, results)=>{
-        if(error){
-            throw error;
-        }
-        return res.status(201).json({
-            success: true,
-            error: "",
-            message: 'Du har lagt till en ny genre.'
-        })
-      })
+        await connectionMySQL.query(sql, params, (error, results) => {
+            if (error) {
+                throw error;
+            }
+            return res.status(201).json({
+                success: true,
+                error: "",
+                message: 'Du har lagt till en ny genre.'
+            });
+        });
     } catch (error) {
         return res.status(500).json({
-            succes: false,
+            success: false,
             error: error.message
-        })
+        });
     }
-  };
+};
 
   // Ta bort en genre, DELETE
 
   exports.deleteOneGenre = async (req, res) => {
-    const { genreId } = req.params;
+    const { genreId } = req.body;
 
     if (!genreId) {
       return res.status(400).json({
@@ -65,7 +65,7 @@ exports.postGenre = async (req, res) => {
     }
 
     try {
-   
+      
       // Radera Genren.
       const deleteGenreQuery = "DELETE FROM genres WHERE genreId = ?";
       await connectionMySQL.query(deleteGenreQuery, [genreId]);
@@ -85,17 +85,16 @@ exports.postGenre = async (req, res) => {
   // Ändra en Genre, PUT
 
   exports.changeGenre = async (req, res) => {
-    const { genreName } = req.body;
-    const { genreId } = req.params; // Hämta genreId från URL-parametrar
-
+    const { genreName, genreId } = req.body;
+    
     const sql = "UPDATE genres SET genreName = ? WHERE genreId = ?";
     const params = [genreName, genreId];
 
     try {
-        if (!genreName || genreName.trim() === "") {
+        if (!genreName || genreName.trim() === "" || isNaN(genreId)) {
             return res.status(400).json({
                 success: false,
-                error: 'Genre måste ha ett namn'
+                error: 'Genre måste ha ett namn och ett ID'
             });
         }
 

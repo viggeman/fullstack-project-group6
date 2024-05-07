@@ -1,16 +1,22 @@
 <script setup>
 import { useUserStore } from '../stores/userStore';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 
 const userStore = useUserStore();
-const isLoggedIn = ref(userStore.isLoggedIn);
+const userData = JSON.parse(localStorage.getItem('userData'));
+
+const isLoggedIn = userData ? ref(userData.isLoggedIn) : ref(false);
+console.log(isLoggedIn.value);
 
 userStore.$subscribe(() => {
     isLoggedIn.value = userStore.isLoggedIn;
+    console.log(isLoggedIn.value);
 });
 
 const handleLogout = () => {
     userStore.logout();
+    isLoggedIn.value = false;
+    console.log('logga ut');
 };
 </script>
 
