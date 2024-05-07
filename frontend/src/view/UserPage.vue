@@ -90,14 +90,15 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { fetchData, postData, putData, deleteData } from '../services/crud.js';
-import { useRoute } from 'vue-router';
+import { useUserStore } from '../stores/userStore.js';
 
 const rUrl = 'http://localhost:3000/api/ratings/';
 const mUrl = 'http://localhost:3000/api/movies/';
-const route = useRoute();
+const userStore = useUserStore();
 
-// Skapa reaktiva referenser med ref
-const userId = ref(route.params.userId);
+const userId = ref(null);
+const isLoggedIn = ref(false);
+const userName = ref('');
 const selectedMovie = ref(null);
 const selectedRating = ref(null);
 const movies = ref([]);
@@ -106,10 +107,37 @@ const ratedMovies = ref([]);
 const selectedRatedMovie = ref(null);
 const selectedUpdatedRating = ref(null);
 
-onMounted(async () => {
-    await fetchRatedMovies();
-    await fetchMovies();
+const userData = JSON.parse(localStorage.getItem('userData'));
+if (userData) {
+    isLoggedIn.value = userData.isLoggedIn;
+    userId.value = userData.userId;
+    userName.value = userData.userName;
+}
+
+userStore.$subscribe(() => {
+    isLoggedIn.value = userStore.isLoggedIn;
 });
+
+onMounted(async () => {
+    if (isLoggedIn.value) {
+        await fetchRatedMovies();
+        await fetchMovies();
+    }
+});
+
+const setResponse = (data, msg) => {
+    response.value = {
+        success: data.success,
+        message: msg ? `${data.message}: ${msg}` : data.message,
+    };
+
+    setTimeout(() => {
+        response.value = {
+            success: null,
+            message: '',
+        };
+    }, 5000);
+};
 
 const submitRating = async () => {
     // Check if the selected movie is already rated by the user
@@ -154,23 +182,28 @@ const submitRating = async () => {
     }
 };
 
-// Function to fetch movies from backend
+// Funktion för att hämta filmer från backend
 const fetchMovies = async () => {
     try {
         const movieData = await fetchData(mUrl);
-        // Update the movies array with the response
+        // Uppdatera movies-arrayen med svaret
         movies.value = movieData;
 
-        // Fetch rated movies after fetching all movies
+        // Hämta betygsatta filmer efter att alla filmer har hämtats
         await fetchRatedMovies();
     } catch (error) {
         console.error('Error fetching movies:', error);
     }
 };
 
-// Hämta betygsatta filmer från backend
+// Funktion för att hämta betygsatta filmer från backend
 const fetchRatedMovies = async () => {
     try {
+        if (!userId.value) {
+            console.error('userId is null');
+            return;
+        }
+
         const ratedMoviesData = await fetchData(
             `http://localhost:3000/api/user/ratings/${userId.value}`
         );
@@ -210,13 +243,13 @@ const updateRating = async () => {
             rating: selectedUpdatedRating.value,
         };
 
-        // Update rating in backend
+        // Uppdatera betyg i backend
         await putData(`${rUrl}${selectedRatedMovie.value._id}`, body);
 
-        // Refresh rated movies list
+        // Uppdatera listan över betygsatta filmer
         await fetchRatedMovies();
 
-        // Clear selected rated movie and rating after updating
+        // Rensa vald betygsatt film och betyg efter uppdatering
         selectedRatedMovie.value = null;
         selectedUpdatedRating.value = null;
     } catch (error) {
@@ -240,16 +273,8 @@ const deleteRating = async () => {
 };
 
 const handleLogout = () => {
-    // Ta bort användarsessionen från localStorage
-    localStorage.removeItem('userData');
-    // Återställ användarstatus
-    isLoggedIn.value = false; // Anta att du har en `ref` med namnet `isLoggedIn` som håller reda på användarstatus
-    // Återställ eventuellt annat tillstånd som behöver återställas
-    // Om du vill skicka ett meddelande eller något annat tillbaka, använd setResponse
-    setResponse({ success: true, message: 'Logged out' });
-
-    // Omdirigera användaren till inloggningssidan
-    router.push('/user-login');
+    userStore.logout();
+    isLoggedIn.value = false;
 };
 </script>
 
@@ -257,7 +282,7 @@ const handleLogout = () => {
 .container {
     background-color: black;
     background-image: radial-gradient(rgba(0, 150, 0, 0.75), black 120%);
-    height: 100%;
+    height: 100vh;
     margin: 0;
     overflow: hidden;
     padding: 2rem;
