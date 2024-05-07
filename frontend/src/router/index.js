@@ -8,6 +8,7 @@ import Users from '../view/Users.vue';
 import UserLogin from '../view/UserLogin.vue';
 import FetchMovie from '../view/FetchMovie.vue';
 import FetchDirector from '../view/FetchDirector.vue';
+import UserPage from '../view/UserPage.vue';
 
 const routes = [
     { path: '/', component: Home },
@@ -19,6 +20,7 @@ const routes = [
     { path: '/user-login', component: UserLogin },
     { path: '/fetch-movie', component: FetchMovie },
     { path: '/fetch-director', component: FetchDirector },
+    { path: '/user-page/:userId', name: 'UserPage', component: UserPage },
 ];
 
 const router = createRouter({
