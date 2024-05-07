@@ -58,27 +58,21 @@ const handleLogout = () => {
 </style>
 
 <template>
-    <header class="header">
-        <nav class="main-nav">
-            <router-link to="/"><h2>GRUPP6</h2></router-link>
-            <ul class="menu-col1">
-                <li><router-link to="/fetch-movie">Movie</router-link></li>
-                <li>
-                    <router-link to="/fetch-movie-actor"
-                        >MovieActors</router-link
-                    >
-                </li>
-                <li><router-link to="/fetch-writer">Writers</router-link></li>
-                <li><router-link to="/fetch-actor">Actors</router-link></li>
-                <li><router-link to="/fetch-genre">Genres</router-link></li>
-                <li><router-link to="/users">Users</router-link></li>
-            </ul>
-        </nav>
-        <nav class="login-nav">
-            <router-link v-if="!isLoggedIn" to="/user-login"
-                >Log In</router-link
-            >
-            <button v-else @click="handleLogout">Logout</button>
-        </nav>
-    </header>
+  <header class="header">
+    <nav class="main-nav">
+      <router-link to="/"><h2>GRUPP6</h2></router-link>
+      <ul class="menu-col1">
+        <li><router-link to="/fetch-movie-actor">MovieActors</router-link></li>
+        <li><router-link to="/fetch-writer">Writers</router-link></li>
+        <li><router-link to="/fetch-actor">Actors</router-link></li>
+        <li><router-link to="/fetch-genre">Genres</router-link></li>
+        <li><router-link to="/users">Users</router-link></li>
+        <li><router-link to="/fetch-movie">Movies</router-link></li>
+      </ul>
+    </nav>
+    <nav class="login-nav">
+      <router-link v-if="!isLoggedIn" to="/user-login">Log In</router-link>
+      <button v-else @click="handleLogout">Logout</button>
+    </nav>
+  </header>
 </template>
