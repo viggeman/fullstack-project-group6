@@ -13,6 +13,7 @@
   const loginPassword = ref('');
   const loginName = ref('');
   const userStore = useUserStore();
+  const isLoggedIn = ref(false);
 
   // Access the user state properties
   const response = ref({

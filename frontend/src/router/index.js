@@ -9,6 +9,7 @@ import UserLogin from '../view/UserLogin.vue';
 import FetchMovie from '../view/FetchMovie.vue';
 import FetchDirector from '../view/FetchDirector.vue';
 import UserPage from '../view/UserPage.vue';
+import UserPageFavorite from '../view/UserPageFavorite.vue';
 
 const routes = [
   { path: '/', component: Home },
@@ -21,6 +22,7 @@ const routes = [
   { path: '/fetch-movie', component: FetchMovie },
   { path: '/fetch-director', component: FetchDirector },
   { path: '/user-page', component: UserPage },
+  { path: '/user-page/favorite', component: UserPageFavorite },
 ];
 
 const router = createRouter({
