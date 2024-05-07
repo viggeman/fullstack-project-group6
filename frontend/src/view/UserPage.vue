@@ -1,253 +1,337 @@
-<script setup>
-  import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue';
-  import { useUserStore } from '../stores/userStore.js';
-  import {
-    fetchData,
-    postData,
-    putData,
-    deleteData,
-  } from '../services/crud.js';
-
-  const uUrl = 'http://localhost:3000/api/user/';
-  const mUrl = 'http://localhost:3000/api/movies/';
-  const favMurl = 'http://localhost:3000/api/favorite-movies/';
-  const uId = ref(null);
-  const isLoggedIn = ref(false);
-  const userName = ref('');
-  const userStore = useUserStore();
-  const favMoviesLists = ref([]);
-  const movieNames = ref([]);
-
-  const newListTitle = ref('');
-  const selectedMovies = ref([]);
-  const editMode = ref({
-    status: false,
-    id: null,
-  });
-  const changeListTitle = ref('');
-
-  const userData = JSON.parse(localStorage.getItem('userData'));
-  if (userData) {
-    console.log('userdata', userData);
-    isLoggedIn.value = userData.isLoggedIn;
-    uId.value = userData.userId;
-    userName.value = userData.userName;
-  }
-
-  userStore.$subscribe(() => {
-    isLoggedIn.value = userStore.isLoggedIn;
-    console.log(isLoggedIn.value);
-  });
-
-  onMounted(async () => {
-    if (isLoggedIn.value) {
-      favMoviesLists.value = await fetchData(favMurl + uId.value);
-      console.log('favMoviesLists', favMoviesLists.value);
-      const movies = await fetchMovieNames();
-      console.log('movies', movies);
-      movieNames.value = movies;
-    }
-  });
-
-  const fetchMovieNames = async () => {
-    const movieData = await fetchData(mUrl);
-    const movieNames = [];
-    movieData.forEach((movie) => {
-      movieNames.push({ name: movie.movieName, id: movie.movieId });
-    });
-    return movieNames;
-  };
-
-  const handleLogout = () => {
-    userStore.logout();
-    isLoggedIn.value = false;
-  };
-
-  const createFavoriteList = async () => {
-    const movies = selectedMovies.value.map((movieId) => {
-      return { movieId };
-    });
-    console.log('moviesPist', movies);
-    const res = await postData(favMurl, {
-      userId: uId.value,
-      favoriteListTitle: newListTitle.value,
-      movies: movies,
-    });
-
-    console.log('res', res);
-
-    if (res) {
-      favMoviesLists.value = await fetchData(favMurl + uId.value);
-      selectedMovies.value = [];
-      newListTitle.value = '';
-    } else {
-      console.log('Error creating favorite list');
-    }
-  };
-
-  const deleteFavoriteList = async (listId) => {
-    const res = await deleteData(favMurl + listId);
-    console.log('Favorite list deleted', listId);
-    if (res) {
-      favMoviesLists.value = await fetchData(favMurl + uId.value);
-    } else {
-      console.log('Error deleting favorite list');
-    }
-  };
-
-  const changeFavoriteList = async (listId, newTitle) => {
-    const res = await putData(favMurl + listId, {
-      favoriteListTitle: newTitle,
-    });
-    console.log('res', res);
-    if (res) {
-      editMode.value = {
-        status: false,
-        id: null,
-      };
-      favMoviesLists.value = await fetchData(favMurl + uId.value);
-    } else {
-      console.log('Error updating favorite list');
-    }
-  };
-
-  const toggleEdit = (listId) => {
-    editMode.value.status = !editMode.value.status;
-    editMode.value.id = listId;
-    console.log('editMode', editMode.value);
-  };
-</script>
-
 <template>
-  <div class="container">
-    <h1>User Page</h1>
-    <p v-if="isLoggedIn">Logged in as: {{ userName }}</p>
-    <p v-else>Not logged in</p>
-    <div class="add-fav-movie">
-      <form v-if="isLoggedIn" @submit.prevent="createFavoriteList">
-        <h2>Create a favorite list</h2>
-        <input type="text" v-model="newListTitle" />
-        <div>
-          <p>Select movies:</p>
-          <label v-for="movie in movieNames" :key="movie.id">
-            <input type="checkbox" v-model="selectedMovies" :value="movie.id" />
-            {{ movie.name }}
-          </label>
+    <div class="container">
+        <button @click="handleLogout" class="submit-button">Logout</button>
+        <!-- Add movie rating form -->
+        <div v-if="movies.length > 0" class="movie-section">
+            <h2>Rate a Movie</h2>
+            <select v-model="selectedMovie" class="select-field">
+                <option disabled value="">Choose movie</option>
+                <option
+                    v-for="movie in movies"
+                    :key="movie.movieId"
+                    :value="movie.movieId"
+                >
+                    {{ movie.movieName }}
+                </option>
+            </select>
+            <br />
+            <select v-model="selectedRating" class="select-field">
+                <option disabled value="">Rate</option>
+                <option v-for="rating in ratings" :key="rating" :value="rating">
+                    {{ rating }}
+                </option>
+            </select>
+            <!-- Conditional rendering of the button -->
+            <button
+                @click="submitRating"
+                :disabled="!selectedMovie || !selectedRating"
+                class="submit-button"
+            >
+                Submit
+            </button>
         </div>
-        <input type="submit"></input>
-      </form>
-    </div>
-    <div class="fav-grid" v-if="favMoviesLists">
-      <div class="fav-movie-list" v-for="item in favMoviesLists" :id="item._id">
-        <div class="fav-movie-title">
-          <h2>{{ item.favoriteListTitle }}</h2>
-          <input v-if="editMode.status && item._id === editMode.id" type="text" v-model="changeListTitle" />
-          <div>
-            <button class="delete-button" @click.prevent="deleteFavoriteList(item._id)">Delete</button>
-            <button class="delete-button" @click="toggleEdit(item._id)">Change</button>
-            <button v-if="editMode.status && item._id === editMode.id" class="delete-button" @click.prevent="changeFavoriteList(item._id, changeListTitle)">Update</button>
-          </div>
+        <div v-else class="movie-section">
+            <p>Loading movies...</p>
         </div>
-
-        <ul class="fav-list">
-          <h2>Movies</h2>
-          <li v-for="movie in item.movies">
-            {{ movie.movieId }}
-          </li>
-        </ul>
-      </div>
+        <!-- List of user's rated movies -->
+        <div v-if="ratedMovies.length > 0" class="movie-section">
+            <h2>Rated Movies</h2>
+            <ul>
+                <li v-for="movie in ratedMovies" :key="movie.movieId">
+                    {{ movie.movieName }} - Rating: {{ movie.rating }}
+                </li>
+            </ul>
+        </div>
+        <!-- Update movie rating form -->
+        <div class="input-section">
+            <h2 class="movie-section">Update Rating</h2>
+            <select
+                v-model="selectedRatedMovie"
+                @change="updateSelectedRating"
+                class="select-field"
+            >
+                <option disabled value="">Choose movie</option>
+                <option
+                    v-for="movie in ratedMovies"
+                    :key="movie.movieId"
+                    :value="movie"
+                >
+                    {{ movie.movieName }}
+                </option>
+            </select>
+            <div v-if="selectedRatedMovie">
+                <p class="movie-section">
+                    Current Rating: {{ selectedRatedMovie.rating }}
+                </p>
+                <select v-model="selectedUpdatedRating" class="select-field">
+                    <option
+                        v-for="rating in ratings"
+                        :key="rating"
+                        :value="rating"
+                    >
+                        {{ rating }}
+                    </option>
+                </select>
+                <button @click="updateRating" class="submit-button">
+                    Update Rating
+                </button>
+                <button
+                    @click="deleteRating"
+                    v-if="selectedRatedMovie"
+                    class="submit-button"
+                >
+                    Delete Rating
+                </button>
+            </div>
+        </div>
     </div>
-    <form @submit.prevent="handleLogout">
-        <input type="submit" value="Logout" />
-      </form>
-  </div>
 </template>
 
+<script setup>
+import { ref, onMounted } from 'vue';
+import { fetchData, postData, putData, deleteData } from '../services/crud.js';
+import { useRoute } from 'vue-router';
+
+const rUrl = 'http://localhost:3000/api/ratings/';
+const mUrl = 'http://localhost:3000/api/movies/';
+const route = useRoute();
+
+// Skapa reaktiva referenser med ref
+const userId = ref(route.params.userId);
+const selectedMovie = ref(null);
+const selectedRating = ref(null);
+const movies = ref([]);
+const ratings = ref([1, 2, 3, 4, 5]);
+const ratedMovies = ref([]);
+const selectedRatedMovie = ref(null);
+const selectedUpdatedRating = ref(null);
+
+onMounted(async () => {
+    await fetchRatedMovies();
+    await fetchMovies();
+});
+
+const submitRating = async () => {
+    // Check if the selected movie is already rated by the user
+    const alreadyRated = ratedMovies.value.some(
+        (movie) => movie.movieId === selectedMovie.value
+    );
+
+    if (alreadyRated) {
+        console.error('You have already rated this movie.');
+        return;
+    }
+
+    // If not already rated, proceed to submit the rating
+    const res = await postData(rUrl, {
+        userId: userId.value,
+        movieId: selectedMovie.value,
+        rating: selectedRating.value,
+    });
+
+    console.log(res, 'res1');
+
+    // Handle response from backend, show success or error message to user
+    if (res) {
+        // Update ratedMovies directly with the newly added rating
+        const newRating = {
+            movieId: selectedMovie.value,
+            rating: selectedRating.value,
+        };
+        ratedMovies.value.push(newRating);
+
+        // Clear the selected movie and rating after submitting
+        selectedMovie.value = null;
+        selectedRating.value = null;
+
+        // Manually update the movie name for the newly added rating
+        const matchedMovie = await fetchMovies(selectedMovie.value);
+        newRating.movieName = matchedMovie ? matchedMovie.movieName : 'Unknown';
+    } else {
+        const errorMessage = res.message || 'Unknown error';
+        console.error('Error submitting rating:', res.statusText);
+        console.log('Response from server:', res);
+    }
+};
+
+// Function to fetch movies from backend
+const fetchMovies = async () => {
+    try {
+        const movieData = await fetchData(mUrl);
+        // Update the movies array with the response
+        movies.value = movieData;
+
+        // Fetch rated movies after fetching all movies
+        await fetchRatedMovies();
+    } catch (error) {
+        console.error('Error fetching movies:', error);
+    }
+};
+
+// Hämta betygsatta filmer från backend
+const fetchRatedMovies = async () => {
+    try {
+        const ratedMoviesData = await fetchData(
+            `http://localhost:3000/api/user/ratings/${userId.value}`
+        );
+        // Hämta filmdata från mUrl
+        const allMoviesData = await fetchData(mUrl);
+
+        // Loopa igenom betygsdata och matcha movieId med filmdata för att få filmtitlar
+        ratedMovies.value = ratedMoviesData.map((ratedMovie) => {
+            const matchedMovie = allMoviesData.find(
+                (movie) => movie.movieId === ratedMovie.movieId
+            );
+            return {
+                ...ratedMovie,
+                movieName: matchedMovie ? matchedMovie.movieName : 'Unknown',
+            };
+        });
+    } catch (error) {
+        console.error('Error fetching rated movies:', error);
+    }
+};
+
+const updateSelectedRating = () => {
+    if (selectedMovie.value) {
+        selectedRating.value = selectedMovie.value.rating;
+    }
+};
+
+const updateRating = async () => {
+    if (!selectedRatedMovie) {
+        console.error('No movie selected to update rating');
+        return;
+    }
+
+    try {
+        // Skapa bodyn för PUT-förfrågan
+        const body = {
+            rating: selectedUpdatedRating.value,
+        };
+
+        // Update rating in backend
+        await putData(`${rUrl}${selectedRatedMovie.value._id}`, body);
+
+        // Refresh rated movies list
+        await fetchRatedMovies();
+
+        // Clear selected rated movie and rating after updating
+        selectedRatedMovie.value = null;
+        selectedUpdatedRating.value = null;
+    } catch (error) {
+        console.error('Error updating rating:', error.message);
+    }
+};
+
+const deleteRating = async () => {
+    if (!selectedRatedMovie) {
+        console.error('No movie selected to delete rating');
+        return;
+    }
+
+    try {
+        await deleteData(`${rUrl}${selectedRatedMovie.value._id}`);
+        await fetchRatedMovies();
+        console.log('Rating deleted successfully');
+    } catch (error) {
+        console.error('Error deleting rating:', error.message);
+    }
+};
+
+const handleLogout = () => {
+    // Ta bort användarsessionen från localStorage
+    localStorage.removeItem('userData');
+    // Återställ användarstatus
+    isLoggedIn.value = false; // Anta att du har en `ref` med namnet `isLoggedIn` som håller reda på användarstatus
+    // Återställ eventuellt annat tillstånd som behöver återställas
+    // Om du vill skicka ett meddelande eller något annat tillbaka, använd setResponse
+    setResponse({ success: true, message: 'Logged out' });
+
+    // Omdirigera användaren till inloggningssidan
+    router.push('/user-login');
+};
+</script>
+
 <style scoped>
-  .container {
+.container {
     background-color: black;
     background-image: radial-gradient(rgba(0, 150, 0, 0.75), black 120%);
-    min-height: 100vh;
+    height: 100%;
     margin: 0;
+    overflow: hidden;
     padding: 2rem;
-  }
-  h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
     color: white;
-  }
-  p {
+    font: 1.3rem Inconsolata, monospace;
+    text-shadow: 0 0 5px #c8c8c8;
+    position: relative;
+}
+
+.movie-section {
+    padding: 10px;
+}
+
+.movie-section h1 {
     font-size: 16px;
-    margin-bottom: 5px;
-    color: white;
-  }
-  input[type='text'],
-  select {
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.input-field,
+.select-field {
     margin-bottom: 10px;
     padding: 5px;
-    width: 200px;
-  }
-  input[type='checkbox'] {
-    margin-right: 5px;
-
-  }
-  input[type='submit'] {
-    margin-top: 1rem;
-    padding: 5px 10px;
-    background-color: #007bff;
+    border: 1px solid #fff;
+    background-color: #000;
     color: #fff;
-    border: none;
+    width: 200px;
+    font-family: Inconsolata, monospace;
+}
+
+.small-input {
+    width: 100%;
+}
+
+.input-field::placeholder,
+.select-field option {
+    color: #888;
+}
+
+.submit-button {
+    padding: 5px 10px;
+    border: 1px solid #fff;
+    background-color: #888;
+    color: #000;
     cursor: pointer;
-  }
-  input[type='submit']:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  .success {
-    color: green;
-  }
-  .error {
-    color: red;
-  }
+}
 
-  .delete-button {
-    background-color: none;
-    color: red;
-    border: none;
-    cursor: pointer;
-  }
+.error-message {
+    color: #ff6347;
+}
 
-  .fav-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-top: 20px;
-  }
-  .add-fav-movie {
-    padding: 2rem;
-    margin-top: 20px;
-    max-width: 50%;
-    background-color: rgba(0, 0, 0, 0.4);
-  }
-  .fav-movie-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-top: 2rem;
-    padding: 2rem;
-    margin-right: 2rem;
-    margin-top: 20px;
-    background-color: rgba(0, 0, 0, 0.4);
-  }
+.success-message {
+    color: #32cd32;
+}
 
-  .fav-movie-title {
-    margin-right: 2rem;
-  }
-
-  .fav-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.15),
+        rgba(255, 255, 255, 0.15) 1px,
+        transparent 4px,
+        transparent 4px
+    );
+    pointer-events: none;
+}
 </style>

@@ -24,6 +24,7 @@ const moviesRoutes = require('./routes/moviesRoutes');
 const directorsRoutes = require('./routes/directorsRoutes');
 const userRoutes = require('./routes/userRoutes');
 const favoriteMoviesRoutes = require('./routes/favoriteMoviesRoutes');
+const ratingsRoutes = require('./routes/ratingsRoutes');
 
 app.use(testRoutes);
 app.use(testMongoRoutes);
@@ -35,6 +36,7 @@ app.use(moviesRoutes);
 app.use(directorsRoutes);
 app.use(userRoutes);
 app.use(favoriteMoviesRoutes);
+app.use(ratingsRoutes);
 
 const connectionMongoDB = require('./connectionMongoDB');
 connectionMongoDB();

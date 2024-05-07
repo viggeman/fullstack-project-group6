@@ -1,4 +1,6 @@
-const Rating = require('../models/Rating');
+const Rating = require('../models/ratingsModel');
+const connectionMySQL = require('../connectionMySQL');
+const mongoose = require('mongoose');
 
 // Controller functions
 exports.getAllRatings = async (req, res) => {
@@ -12,7 +14,11 @@ exports.getAllRatings = async (req, res) => {
 
 exports.getRatingById = async (req, res) => {
     try {
-        const rating = await Rating.findById(req.params.id);
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid rating ID' });
+        }
+        const rating = await Rating.findById(id);
         if (!rating) {
             return res.status(404).json({ message: 'Rating not found' });
         }
@@ -22,8 +28,27 @@ exports.getRatingById = async (req, res) => {
     }
 };
 
+// Controller function to get all ratings for a specific user
+exports.getUserRatings = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Validera om userId finns
+        if (!userId) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
+        const userRatings = await Rating.find({ userId });
+        res.json(userRatings);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 exports.createRating = async (req, res) => {
     const rating = new Rating({
+        userId: req.body.userId,
+        movieId: req.body.movieId,
         rating: req.body.rating,
     });
     try {
@@ -54,7 +79,7 @@ exports.deleteRatingById = async (req, res) => {
         if (!rating) {
             return res.status(404).json({ message: 'Rating not found' });
         }
-        await rating.remove();
+        await rating.deleteOne(); // Använd deleteOne() istället för remove()
         res.json({ message: 'Rating deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });
