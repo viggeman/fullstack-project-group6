@@ -14,20 +14,17 @@
   const uId = ref(null);
   const isLoggedIn = ref(false);
   const userName = ref('');
-  const loginPassword = ref('');
-  const loginName = ref('');
   const userStore = useUserStore();
   const favMoviesLists = ref([]);
   const movieNames = ref([]);
 
   const newListTitle = ref('');
   const selectedMovies = ref([]);
-
-  // Access the user state properties
-  const response = ref({
-    success: null,
-    message: '',
+  const editMode = ref({
+    status: false,
+    id: null,
   });
+  const changeListTitle = ref('');
 
   const userData = JSON.parse(localStorage.getItem('userData'));
   if (userData) {
@@ -52,20 +49,6 @@
     }
   });
 
-  const setResponse = (data, msg) => {
-    response.value = {
-      success: data.success,
-      message: msg ? `${data.message}: ${msg}` : data.message,
-    };
-
-    setTimeout(() => {
-      response.value = {
-        success: null,
-        message: '',
-      };
-    }, 5000);
-  };
-
   const fetchMovieNames = async () => {
     const movieData = await fetchData(mUrl);
     const movieNames = [];
@@ -75,31 +58,8 @@
     return movieNames;
   };
 
-  //call user store action
-  const handleLogin = async (username, password) => {
-    const url = uUrl + 'login';
-    const res = await postData(url, {
-      userName: username,
-      userPassword: password,
-    });
-
-    if (res.success) {
-      setResponse(res, res.name);
-      userStore.login(res.id, res.name);
-      userName.value = userStore.getUserName;
-
-      favMoviesLists.value = await fetchData(favMurl + res.id);
-
-      console.log(favMoviesLists.value);
-      console.log(userStore.getIsLoggedIn);
-    } else {
-      console.log('Error logging in');
-    }
-  };
-
   const handleLogout = () => {
     userStore.logout();
-    setResponse({ success: true, message: 'Logged out' });
     isLoggedIn.value = false;
   };
 
@@ -118,6 +78,8 @@
 
     if (res) {
       favMoviesLists.value = await fetchData(favMurl + uId.value);
+      selectedMovies.value = [];
+      newListTitle.value = '';
     } else {
       console.log('Error creating favorite list');
     }
@@ -131,6 +93,28 @@
     } else {
       console.log('Error deleting favorite list');
     }
+  };
+
+  const changeFavoriteList = async (listId, newTitle) => {
+    const res = await putData(favMurl + listId, {
+      favoriteListTitle: newTitle,
+    });
+    console.log('res', res);
+    if (res) {
+      editMode.value = {
+        status: false,
+        id: null,
+      };
+      favMoviesLists.value = await fetchData(favMurl + uId.value);
+    } else {
+      console.log('Error updating favorite list');
+    }
+  };
+
+  const toggleEdit = (listId) => {
+    editMode.value.status = !editMode.value.status;
+    editMode.value.id = listId;
+    console.log('editMode', editMode.value);
   };
 </script>
 
@@ -157,8 +141,14 @@
       <div class="fav-movie-list" v-for="item in favMoviesLists" :id="item._id">
         <div class="fav-movie-title">
           <h2>{{ item.favoriteListTitle }}</h2>
-          <button class="delete-button" @click.prevent="deleteFavoriteList(item._id)">Delete</button>
+          <input v-if="editMode.status && item._id === editMode.id" type="text" v-model="changeListTitle" />
+          <div>
+            <button class="delete-button" @click.prevent="deleteFavoriteList(item._id)">Delete</button>
+            <button class="delete-button" @click="toggleEdit(item._id)">Change</button>
+            <button v-if="editMode.status && item._id === editMode.id" class="delete-button" @click.prevent="changeFavoriteList(item._id, changeListTitle)">Update</button>
+          </div>
         </div>
+
         <ul class="fav-list">
           <h2>Movies</h2>
           <li v-for="movie in item.movies">
