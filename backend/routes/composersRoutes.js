@@ -8,13 +8,19 @@ router.get('/api/composers', composersController.getComposers);
 //GET request to fetch specific composer
 router.get('/api/composers/:id', composersController.getComposer);
 
-//POST request to add new actor
-router.post('/api/composer', composersController.createComposer);
+// GET request to fetch all composers with their movies
+router.get('/api/composersmovies', composersController.getAllComposersMovies);
+
+//POST request to add new composer
+router.post('/api/composers', composersController.createComposer);
+
+//POST request to add a movie to a specific composer
+router.post('/api/composers/:id/movies', composersController.addComposerMovie);
 
 //DELETE request to delete specific composer by ID
-router.delete('/api/composer', composersController.deleteComposer);
+router.delete('/api/composers', composersController.deleteComposer);
 
 //PUT request to update specific composer by ID
-router.put('/api/composer', composersController.updateComposer);
+router.put('/api/composers/:id', composersController.updateComposer);
 
 module.exports = router;
